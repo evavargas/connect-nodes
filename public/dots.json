@@ -1,0 +1,31 @@
+[
+    {
+        "user": "Larry",
+        "color": "red",
+        "x": "70",
+        "y": "30",
+        "radius": "10",
+        "stroke": "blue"
+    },
+    {"user": "Patty",
+        "color": "green",
+        "x":"30",
+        "y":"70",
+        "radius": "10",
+        "stroke":"yellow"
+    },
+    {"user": "Patty",
+        "color": "green",
+        "x":"100",
+        "y":"100",
+        "radius": "10",
+        "stroke":"yellow"
+    },
+    {"user": "Larry",
+        "color": "red",
+        "x":"400",
+        "y":"400",
+        "radius": "10",
+        "stroke":"blue"
+    }
+]
