@@ -13,7 +13,7 @@ export default {
   props: ["dotsData"],
   data() {
     return {
-      msg: "😃",
+      msg: "💃🕺",
       svg:'',
     };
   },
