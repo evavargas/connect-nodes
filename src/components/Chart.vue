@@ -9,27 +9,15 @@
 <script>
 import * as d3 from "d3";
 export default {
-  name: "PackChart",
+  name: "Chart",
   props: ["dotsData"],
   data() {
     return {
       msg: "😃",
       svg:'',
-      nodes:[
-    {id: "HI",    position: [2, 0], parentPosition: [2, 0]},
-    {id: "I",     position: [1, 1], parentPosition: [2, 0]},
-    {id: "Am",    position: [3, 1], parentPosition: [2, 0]},
-    {id: "A",     position: [0, 2], parentPosition: [1, 1]},
-    {id: "Graph", position: [1, 2], parentPosition: [1, 1]},
-    {id: "With",  position: [2, 2], parentPosition: [1, 1]},
-    {id: "Nodes", position: [3, 2], parentPosition: [3, 1]},
-    {id: "and",   position: [4, 2], parentPosition: [3, 1]},
-    {id: "Links", position: [5, 2], parentPosition: [3, 1]}
-
-      ],
     };
   },
-  mounted() {
+  updated() {
     this.chart();
   },
   methods: {
@@ -48,7 +36,7 @@ export default {
         //Agregando nodos al canvas
         this.svg
           .selectAll("circle")
-          .data(this.nodes)
+          .data(this.dotsData)
           .join('circle')
           .attr("cx",d => d3.pointRadial(xScale(d.position[0]), yScale(d.position[1]) )[0])
           .attr("cy",d => d3.pointRadial(xScale(d.position[0]), yScale(d.position[1]) )[1])
@@ -58,7 +46,7 @@ export default {
           //Adding the link paths 
           this.svg
           .selectAll("path")
-          .data(this.nodes)
+          .data(this.dotsData)
           .join("path")
           .attr("d", link)
           .classed("link", true)
@@ -67,7 +55,7 @@ export default {
     // Adding text nodes, the x and y have special functions to get them in a place where they do not overlap the links
       this.svg
           .selectAll("text")
-          .data(this.nodes)
+          .data(this.dotsData)
           .join("text")
           .attr("font-size", "11px")
           .attr("text-anchor", "middle")
@@ -94,12 +82,9 @@ export default {
 };
 </script>
 
-<!-- Add "scoped" attribute to limit CSS to this component only -->
 <style>
 .canvas {
   background-color: #F0FFF3;
-  width: 100%;
-  height: 100%;
 }
 .circle{
   background-color: blue;
