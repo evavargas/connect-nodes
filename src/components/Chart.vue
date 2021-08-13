@@ -1,7 +1,5 @@
 <template>
   <div>
-    <h1>Nodes linked with D3</h1>
-    <h2>{{ msg }}</h2>
     <div class="canvas" id="canvas"></div>
   </div>
 </template>
@@ -13,7 +11,6 @@ export default {
   props: ["dotsData"],
   data() {
     return {
-      msg: "💃🕺",
       svg:'',
     };
   },
@@ -96,7 +93,7 @@ svg{
   display: inline;
 }
 .link{
-  fill: cyan;
+  fill: #FFFFFF00;
   stroke: darkmagenta;
 }
 </style>

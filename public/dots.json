@@ -7,5 +7,7 @@
     {"id": "With",  "position": [2, 2], "parentPosition": [1, 1]},
     {"id": "Nodes", "position": [3, 2], "parentPosition": [3, 1]},
     {"id": "and",   "position": [4, 2], "parentPosition": [3, 1]},
-    {"id": "Links", "position": [5, 2], "parentPosition": [3, 1]}
+    {"id": "Links", "position": [5, 2], "parentPosition": [3, 1]},
+    {"id": "Hello", "position": [7, 2], "parentPosition": [1, 2]},
+    {"id": "Thanks", "position": [6, 2], "parentPosition": [1, 1]}
 ]
