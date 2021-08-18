@@ -15,40 +15,35 @@ export default {
     return {
       width: "600",
       height: "600",
-      svg: "",
-      link:'',
-      node:'',
-      simulation: "",
-      drag:'',
     };
   },
   async created() {
     
   },
 mounted() {
-    
+     
   },
   updated() {
-    this.initialize();
+   this.initialize();
   },
   unmounted() {},
   methods: {
     //selecting area
     initialize() {
-      this.svg = d3
+      const svg = d3
         .select("#canvasData")
         .append("svg")
         .attr("viewBox", [0, 0, this.width, this.height])
-        .attr("transform", "translate(0,0)");
+        .attr("transform", "translate(0,0)"),
 
-      this.link = this.svg
+      link = svg
         .selectAll(".link")
         .data(this.links)
         .join("line")
         .classed("link", true)
-        .attr("transform", "translate(45,35)");
+        .attr("transform", "translate(45,35)"),
 
-      this.node = this.svg
+      node = svg
         .selectAll(".rect")
         .data(this.shapes)
         .join("rect")
@@ -56,50 +51,54 @@ mounted() {
         .classed("fixed", (d) => d.fx !== undefined)
         .attr("transform", "translate(45,35)");
       
+
       //force simulation
-      this.simulation = d3
+      const simulation = d3
         .forceSimulation()
         .nodes(this.shapes)
-        .force("charge", d3.forceManyBody().strength())
+        .force("charge", d3.forceManyBody())
         .force("center", d3.forceCenter(this.width / 3, this.height / 3))
-        .force("link", d3.forceLink().links(this.links))
-        .on("tick", this.tick());
+        .force("link", d3.forceLink(this.links).id((d)=> d.id))
+        .on("tick", tick);
       
-      this.drag = d3
+      const drag = d3
         .drag()
-        .on("start", this.dragstart)
-        .on("drag", this.dragged);
+        .on("start", dragstart)
+        .on("drag", dragged);
 
-      this.node.call(this.drag).on("click", this.click);
-      return this.svg.node();
-    },
-    tick() {
-      this.link
+      node.call(drag).on("click", click);
+
+    function tick() {
+      link
       .attr("x1", d => d.source.x)
       .attr("y1", d => d.source.y)
       .attr("x2", d => d.target.x)
       .attr("y2", d => d.target.y);
-      this.node
+    node
       .attr("x", d => d.x)
       .attr("y", d => d.y);
-    },
-    click(event, d){
+    }
+    function click(event, d){
+      console.log(d)
       delete d.fx;
       delete d.fy;
       d3.select(this).classed("fixed", false);
-      this.simulation.alpha(1).restart();
-    },
-    dragstart(){
+      simulation.alpha(1).restart();
+    }
+    function dragstart(){
       d3.select(this).classed("fixed", true);
-    },
-    dragged(event, d){
-      d.fx = this.clamp(event.x, 0, this.width);
-      d.fy = this.clamp(event.y, 0, this.height);
-      this.simulation.alpha(1).restart();
-    },
-    clamp(x, lo, hi) {
+    }
+    function dragged(event, d){
+      console.log(d)
+      d.fx = clamp(event.x, 0, this.width);
+      d.fy = clamp(event.y, 0, this.height);
+      simulation.alpha(1).restart();
+    }
+    function clamp(x, lo, hi) {
       return x < lo ? lo : x > hi ? hi : x;
-      },
+      }
+    return svg.node()
+  },
     createNew() {
       this.svg
         .append("rect")
@@ -130,6 +129,7 @@ mounted() {
   width: 16px;
   height: 10px;
   color: black;
+  cursor: move;
 }
 svg {
   display: inline;

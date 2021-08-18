@@ -1,11 +1,11 @@
 [
-    {"text":"I am alink", "source":0, "target":1, "value": "0"},
-    {"text":"I am alink", "source":1, "target":1, "value": "0"},
-    {"text":"I am alink", "source":2, "target":1, "value": "0"},
-    {"text":"I am alink", "source":3, "target":1, "value": "0"},
-    {"text":"I am alink", "source":4, "target":2, "value": "0"},
-    {"text":"I am alink", "source":5, "target":2, "value": "0"},
-    {"text":"I am alink", "source":6, "target":2, "value": "0"},
-    {"text":"I am alink", "source":7, "target":3, "value": "0"},
-    {"text":"I am alink", "source":8, "target":4, "value": "0"}
+    {"text":"I am alink", "source":0, "target":1},
+    {"text":"I am alink", "source":1, "target":1},
+    {"text":"I am alink", "source":2, "target":1},
+    {"text":"I am alink", "source":3, "target":1},
+    {"text":"I am alink", "source":4, "target":2},
+    {"text":"I am alink", "source":5, "target":2},
+    {"text":"I am alink", "source":6, "target":2},
+    {"text":"I am alink", "source":7, "target":3},
+    {"text":"I am alink", "source":8, "target":4}
 ]
