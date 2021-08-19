@@ -15,90 +15,78 @@ export default {
     return {
       width: "600",
       height: "600",
+      svg: "",
     };
   },
-  async created() {
-    
-  },
-mounted() {
-     
-  },
+  async created() {},
+  mounted() {},
   updated() {
-   this.initialize();
+    this.initialize();
   },
   unmounted() {},
   methods: {
     //selecting area
     initialize() {
-      const svg = d3
+      this.svg = d3
         .select("#canvasData")
         .append("svg")
         .attr("viewBox", [0, 0, this.width, this.height])
-        .attr("transform", "translate(0,0)"),
-
-      link = svg
-        .selectAll(".link")
-        .data(this.links)
-        .join("line")
-        .classed("link", true)
-        .attr("transform", "translate(45,35)"),
-
-      node = svg
-        .selectAll(".rect")
-        .data(this.shapes)
-        .join("rect")
-        .classed("rect", true)
-        .classed("fixed", (d) => d.fx !== undefined)
         .attr("transform", "translate(45,35)");
-      
+
+      const link = this.svg
+          .selectAll(".link")
+          .data(this.links)
+          .join("line")
+          .classed("link", true)
+          .attr("transform", "translate(45,35)"),
+        node = this.svg
+          .selectAll(".rect")
+          .data(this.shapes)
+          .join("rect")
+          .classed("rect", true)
+          .classed("fixed", (d) => d.fx !== undefined)
+          .attr("transform", "translate(45,35)");
 
       //force simulation
       const simulation = d3
         .forceSimulation()
         .nodes(this.shapes)
-        .force("charge", d3.forceManyBody())
-        .force("center", d3.forceCenter(this.width / 3, this.height / 3))
-        .force("link", d3.forceLink(this.links).id((d)=> d.id))
+        .force("link",d3.forceLink(this.links).id((d) => d.id).distance(function(){
+          return 110;
+        }))
         .on("tick", tick);
-      
-      const drag = d3
-        .drag()
-        .on("start", dragstart)
-        .on("drag", dragged);
+
+      const drag = d3.drag().on("start", dragstart).on("drag", dragged);
 
       node.call(drag).on("click", click);
 
-    function tick() {
-      link
-      .attr("x1", d => d.source.x)
-      .attr("y1", d => d.source.y)
-      .attr("x2", d => d.target.x)
-      .attr("y2", d => d.target.y);
-    node
-      .attr("x", d => d.x)
-      .attr("y", d => d.y);
-    }
-    function click(event, d){
-      console.log(d)
-      delete d.fx;
-      delete d.fy;
-      d3.select(this).classed("fixed", false);
-      simulation.alpha(1).restart();
-    }
-    function dragstart(){
-      d3.select(this).classed("fixed", true);
-    }
-    function dragged(event, d){
-      console.log(d)
-      d.fx = clamp(event.x, 0, this.width);
-      d.fy = clamp(event.y, 0, this.height);
-      simulation.alpha(1).restart();
-    }
-    function clamp(x, lo, hi) {
-      return x < lo ? lo : x > hi ? hi : x;
+      function tick() {
+        link
+          .attr("x1", (d) => d.source.x)
+          .attr("y1", (d) => d.source.y)
+          .attr("x2", (d) => d.target.x)
+          .attr("y2", (d) => d.target.y);
+        node.attr("x", (d) => d.x).attr("y", (d) => d.y);
       }
-    return svg.node()
-  },
+      function click(d) {
+        console.log(d);
+        delete d.fx;
+        delete d.fy;
+        d3.select(this).classed("fixed", false);
+        simulation.alpha(1).restart();
+      }
+      function dragstart() {
+        d3.select(this).classed("fixed", true);
+      }
+      function dragged() {
+        d3.select(this)
+          .attr("x", (d) => (d.x += d3.event.dx))
+          .attr("y", (d) => (d.y += d3.event.dy));
+        simulation.alpha(1).restart();
+      }
+
+      return this.svg.node();
+    },
     createNew() {
       this.svg
         .append("rect")
@@ -106,11 +94,10 @@ mounted() {
           return +nodes[i].previousElementSibling.getAttribute("x") + 60;
         })
         .attr("y", (d, i, nodes) => {
-          return +nodes[i].previousElementSibling.getAttribute("y") ;
+          return +nodes[i].previousElementSibling.getAttribute("y");
         })
         .classed("rect", true);
     },
-
   },
   computed: {},
 };
@@ -126,8 +113,8 @@ mounted() {
 .rect {
   fill: #ffe35f;
   stroke: #3d087b;
-  width: 16px;
-  height: 10px;
+  width: 60px;
+  height: 40px;
   color: black;
   cursor: move;
 }
@@ -138,7 +125,7 @@ svg {
   fill: #ffffff00;
   stroke: #f43b86;
 }
-.fixed{
+.fixed {
   fill: #f00;
 }
 .example {
