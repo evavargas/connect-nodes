@@ -15,7 +15,7 @@ export default {
     return {
       width: "600",
       height: "600",
-      svg: "",
+      svg:''
     };
   },
   async created() {},
@@ -31,42 +31,58 @@ export default {
         .select("#canvasData")
         .append("svg")
         .attr("viewBox", [0, 0, this.width, this.height])
-        .attr("transform", "translate(45,35)");
-
-      const link = this.svg
-          .selectAll(".link")
+        .attr("transform", "translate(0,00)");
+      var link = this.svg
+          .selectAll(".line")
           .data(this.links)
           .join("line")
-          .classed("link", true)
-          .attr("transform", "translate(45,35)"),
-        node = this.svg
-          .selectAll(".rect")
+          .classed("line", true)
+          .attr("transform", "translate(45,45)")
+      var node = this.svg
+          .selectAll(".node")
           .data(this.shapes)
-          .join("rect")
-          .classed("rect", true)
+          .enter().append("g")
+          .attr("class", "node")
           .classed("fixed", (d) => d.fx !== undefined)
-          .attr("transform", "translate(45,35)");
+          .attr("transform", "translate(45,45)")
+
+      node
+        .append("svg:rect")
+        .attr("class", "node")
+        .classed("rect", true)
+        .attr("transform", "translate(45,45)")
+
+      node
+        .append("text")
+        .text((d) => d.text)
+        .attr("text-anchor", "middle")
+        .attr("dominant-baseline", "end")
+        .attr("font-size", "8px")
+        .attr("x", d =>d.x + 15)
+        .attr("y", d =>d.y + 10)
+        .attr("transform", "translate(45,45)")
 
       //force simulation
       const simulation = d3
         .forceSimulation()
         .nodes(this.shapes)
-        .force("link",d3.forceLink(this.links).id((d) => d.id).distance(function(){
-          return 110;
-        }))
+        .force(
+          "link",d3.forceLink(this.links)
+            .id((d) => d.id)
+            .distance(100)
+        )
         .on("tick", tick);
 
       const drag = d3.drag().on("start", dragstart).on("drag", dragged);
 
       node.call(drag).on("click", click);
-
       function tick() {
         link
           .attr("x1", (d) => d.source.x)
           .attr("y1", (d) => d.source.y)
           .attr("x2", (d) => d.target.x)
           .attr("y2", (d) => d.target.y);
-        node.attr("x", (d) => d.x).attr("y", (d) => d.y);
+        node.attr("transform", function(d) { return "translate(" + d.x + "," + d.y + ")"; });
       }
       function click(d) {
         console.log(d);
@@ -113,8 +129,16 @@ export default {
 .rect {
   fill: #ffe35f;
   stroke: #3d087b;
-  width: 60px;
-  height: 40px;
+  width: 30px;
+  height: 20px;
+  color: black;
+  cursor: move;
+}
+.node .rect {
+  fill: #ffe35f;
+  stroke: #3d087b;
+  width: 30px;
+  height: 20px;
   color: black;
   cursor: move;
 }
@@ -125,7 +149,7 @@ svg {
   fill: #ffffff00;
   stroke: #f43b86;
 }
-.fixed {
+.node.fixed {
   fill: #f00;
 }
 .example {
