@@ -1,6 +1,6 @@
 <template>
   <div>
-    <div v-if="shapes && links" class="canvasData" id="canvasData">
+    <div class="canvasData" id="canvasData">
       <button @click="createNew">New</button>
     </div>
   </div>
@@ -19,7 +19,9 @@ export default {
     };
   },
   async created() {},
-  mounted() {},
+  mounted() {
+    
+  },
   updated() {
     this.initialize();
   },
@@ -124,7 +126,7 @@ export default {
   background-color: #eeeeee;
 }
 .canvasData :nth-child(2){
-  display: none;
+  height: 0;
 }
 .rect {
   fill: #ffe35f;
