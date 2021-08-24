@@ -1,8 +1,6 @@
 <template>
-  <div>
-    <div class="canvasData" id="canvasData">
-      <button @click="createNew">New</button>
-    </div>
+  <div class="canvasData" id="canvasData">
+    <button @click="addData">New Node</button>
   </div>
 </template>
 
@@ -10,19 +8,27 @@
 import * as d3 from "d3";
 export default {
   name: "NewChart",
-  props: ["shapes", "links"],
+  props: { shapes: Array, links: Array },
   data() {
     return {
       width: "600",
       height: "600",
       svg: "",
+      newNode: {
+        id: 0,
+        y: 30,
+        x: 30,
+        text: "hola",
+        vy: 4,
+        vx: 4,
+      },
     };
   },
   async created() {},
-  mounted() {},
-  updated() {
+  mounted() {
     this.initialize();
   },
+  updated() {},
   unmounted() {},
   methods: {
     //selecting area
@@ -38,13 +44,13 @@ export default {
 
       var link = g
         .selectAll(".line")
-        .data(this.links)
+        .data(this.datalinks)
         .join("line")
         .classed("line", true)
         .attr("transform", "translate(150,150)");
       var node = g
         .selectAll(".node")
-        .data(this.shapes)
+        .data(this.datashapes)
         .enter()
         .append("g")
         .attr("class", "node")
@@ -70,16 +76,17 @@ export default {
       //force simulation
       const simulation = d3
         .forceSimulation()
-        .nodes(this.shapes)
+        .nodes(this.datashapes)
         .force(
           "link",
           d3
-            .forceLink(this.links)
+            .forceLink(this.datalinks)
             .id((d) => d.id)
             .distance(100)
         )
         .on("tick", tick);
 
+      
       const drag = d3
         .drag()
         .on("start", dragstart)
@@ -88,10 +95,16 @@ export default {
 
       node.call(drag).on("click", click);
       this.svg.call(
-        d3.zoom().extent([[0, 0], [this.width, this.height],])
+        d3
+          .zoom()
+          .extent([
+            [0, 0],
+            [this.width, this.height],
+          ])
           .scaleExtent([1, 8])
-          .on("zoom", zoomed) 
+          .on("zoom", zoomed)
       );
+
       function tick() {
         link
           .attr("x1", (d) => d.source.x)
@@ -123,25 +136,46 @@ export default {
         d3.select(this).attr("cursor", "grab");
       }
       function zoomed() {
-        console.log(g)
-    g.attr("transform", d3.event.transform);
-  }
+        console.log(g);
+        g.attr("transform", d3.event.transform);
+      }
+      function restart() {
+        console.log(this)
 
+
+        node.enter().append("g").attr("class", "node").merge(node);
+        link.enter().append("line").attr("class", "line").merge(link);
+        simulation.alpha(1).restart();
+      }
+      restart();
       return this.svg.node();
     },
-    createNew() {
-      this.svg.select("g")
-        .append("rect")
-        .attr("x", (d, i, nodes) => {
-          return +nodes[i].previousElementSibling.getAttribute("x") + 60;
-        })
-        .attr("y", (d, i, nodes) => {
-          return +nodes[i].previousElementSibling.getAttribute("y");
-        })
-        .classed("rect", true);
+    addData() {
+      let newNode = this.newNode;
+      newNode.id = this.datashapes.length;
+      console.log(newNode);
+      this.datashapes.push(this.newNode);
+      console.log(this.datashapes);
     },
   },
-  computed: {},
+  computed: {
+    datashapes: {
+      get() {
+        return this.shapes;
+      },
+      set(newValue) {
+        this.concat(newValue);
+      },
+    },
+    datalinks: {
+      get() {
+        return this.links;
+      },
+      set(newValue) {
+        this.links.concat(newValue);
+      },
+    },
+  },
 };
 </script>
 
@@ -149,9 +183,7 @@ export default {
 .canvasData {
   background-color: #eeeeee;
 }
-.canvasData :nth-child(2) {
-  height: 0;
-}
+
 .rect {
   fill: #ffe35f;
   stroke: #3d087b;
@@ -174,11 +206,14 @@ svg {
   stroke: #f43b86;
 }
 .node.grabbing {
-  cursor: -webkit-grabbing; cursor:-moz-grabbing;
-
+  cursor: -webkit-grabbing;
+  cursor: -moz-grabbing;
 }
 .example {
   width: 300px;
   height: 300px;
+}
+.addButton {
+  background-color: rgb(236, 100, 100);
 }
 </style>

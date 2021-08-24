@@ -1,7 +1,9 @@
 <template>
   <div>
      <div>
+       <keep-alive>
       <NewChart :shapes="shapes" :links="links" />
+      </keep-alive>
     </div>
     <h1>Nodes linked with D3</h1>
     <h2>{{ msg }}</h2>
@@ -12,14 +14,16 @@
 </template>
 
 <script>
+import { defineAsyncComponent } from 'vue'
 import axios from "axios";
 import Chart from "./components/Chart.vue";
-import NewChart from "./components/NewChart.vue";
 export default {
   name: "app",
   components: {
+    NewChart: defineAsyncComponent(() =>
+      import('./components/NewChart.vue')
+    ),
     Chart,
-    NewChart
   },
   data: function () {
     return {
