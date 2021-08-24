@@ -1,27 +1,17 @@
 <template>
-  <div class="canvasData" id="canvasData">
-    <button @click="addData">New Node</button>
-  </div>
+  <div class="canvasData" id="canvasData" v-if="datashapes"></div>
 </template>
 
 <script>
 import * as d3 from "d3";
 export default {
   name: "NewChart",
-  props: { shapes: Array, links: Array },
+  props: { datashapes: Array, datalinks: Array },
   data() {
     return {
       width: "600",
       height: "600",
       svg: "",
-      newNode: {
-        id: 0,
-        y: 30,
-        x: 30,
-        text: "hola",
-        vy: 4,
-        vx: 4,
-      },
     };
   },
   async created() {},
@@ -33,6 +23,9 @@ export default {
   methods: {
     //selecting area
     initialize() {
+      // apply fixed positions found in localStorage
+
+
       this.width = window.innerWidth * 0.66;
       this.height = window.innerHeight * 0.7;
       this.svg = d3
@@ -85,26 +78,6 @@ export default {
             .distance(100)
         )
         .on("tick", tick);
-
-      
-      const drag = d3
-        .drag()
-        .on("start", dragstart)
-        .on("drag", dragged)
-        .on("end", dragended);
-
-      node.call(drag).on("click", click);
-      this.svg.call(
-        d3
-          .zoom()
-          .extent([
-            [0, 0],
-            [this.width, this.height],
-          ])
-          .scaleExtent([1, 8])
-          .on("zoom", zoomed)
-      );
-
       function tick() {
         link
           .attr("x1", (d) => d.source.x)
@@ -115,16 +88,16 @@ export default {
           return "translate(" + d.x + "," + d.y + ")";
         });
       }
-      function click(d) {
-        console.log(d);
-        delete d.fx;
-        delete d.fy;
-        d3.select(this).classed("grabbing", false);
-        simulation.alpha(1).restart();
-      }
-      function dragstart() {
+      const drag = d3
+        .drag()
+        .on("start", dragstarted)
+        .on("drag", dragged)
+        .on("end", dragended);
+
+      function dragstarted() {
         d3.select(this).raise();
         d3.select(this).classed("grabbing", true);
+        simulation.alphaTarget(0.3).restart();
       }
       function dragged() {
         d3.select(this)
@@ -133,47 +106,44 @@ export default {
         simulation.alpha(1).restart();
       }
       function dragended() {
-        d3.select(this).attr("cursor", "grab");
+        if (!d3.event.active) simulation.alphaTarget(0);
       }
+
+      node.call(drag).on("click", click);
+
+      function click(d) {
+        console.log(d);
+        delete d.fx;
+        delete d.fy;
+        d3.select(this).classed("grabbing", false);
+        simulation.alpha(1).restart();
+      }
+
+      this.svg.call(
+        d3
+          .zoom()
+          .extent([
+            [0, 0],
+            [this.width, this.height],
+          ])
+          .scaleExtent([1, 8])
+          .on("zoom", zoomed)
+      );
       function zoomed() {
         console.log(g);
         g.attr("transform", d3.event.transform);
       }
-      function restart() {
-        console.log(this)
 
+      function restart() {
+        console.log(this);
 
         node.enter().append("g").attr("class", "node").merge(node);
         link.enter().append("line").attr("class", "line").merge(link);
         simulation.alpha(1).restart();
       }
       restart();
+
       return this.svg.node();
-    },
-    addData() {
-      let newNode = this.newNode;
-      newNode.id = this.datashapes.length;
-      console.log(newNode);
-      this.datashapes.push(this.newNode);
-      console.log(this.datashapes);
-    },
-  },
-  computed: {
-    datashapes: {
-      get() {
-        return this.shapes;
-      },
-      set(newValue) {
-        this.concat(newValue);
-      },
-    },
-    datalinks: {
-      get() {
-        return this.links;
-      },
-      set(newValue) {
-        this.links.concat(newValue);
-      },
     },
   },
 };

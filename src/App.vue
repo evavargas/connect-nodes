@@ -1,8 +1,9 @@
 <template>
   <div>
      <div>
+       <button @click="addData">New Node</button>
        <keep-alive>
-      <NewChart :shapes="shapes" :links="links" />
+       <NewChart :datashapes="datashapes" :datalinks="datalinks" />
       </keep-alive>
     </div>
     <h1>Nodes linked with D3</h1>
@@ -14,7 +15,7 @@
 </template>
 
 <script>
-import { defineAsyncComponent } from 'vue'
+import { defineAsyncComponent, reactive } from 'vue'
 import axios from "axios";
 import Chart from "./components/Chart.vue";
 export default {
@@ -31,6 +32,16 @@ export default {
       nodes: [],
       shapes: [],
       links: [],
+      newNode: {
+        id: 0,
+        y: 30,
+        x: 30,
+        text: "hola",
+        vy: 4,
+        vx: 4,
+        index:0
+      },
+
     };
   },
   created() {
@@ -51,6 +62,33 @@ export default {
     async getNodes() {
       let response = await axios.get("./dots.json");
       this.nodes = response.data;
+    },
+    addData() {
+      console.log(this.datashapes);
+      let newNode = this.newNode;
+      newNode.id = this.datashapes.length;
+      newNode.index = newNode.id;
+      console.log(newNode);
+      this.datashapes.push(newNode);
+      console.log(this.datashapes);
+    },
+  },
+    computed: {
+    datashapes: {
+      get() {
+        return this.shapes;
+      },
+      set(newValue) {
+        this.concat(newValue);
+      },
+    },
+    datalinks: {
+      get() {
+        return reactive(this.links);
+      },
+      set(newValue) {
+        this.links.concat(newValue);
+      },
     },
   },
 };
