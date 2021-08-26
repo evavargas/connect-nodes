@@ -1,10 +1,12 @@
 <template>
   <div>
     <div>
+      <button @click="addData">New Node</button>
       <keep-alive>
         <NewChart :datashapes="datashapes" :datalinks="datalinks" />
       </keep-alive>
     </div>
+    <!-- <Graph :datashapes="datashapes" :datalinks="datalinks" /> -->
     <h1>Nodes linked with D3</h1>
     <h2>{{ msg }}</h2>
     <div>
@@ -17,11 +19,13 @@
 import { defineAsyncComponent } from "vue";
 import axios from "axios";
 import Chart from "./components/Chart.vue";
+//import Graph from "./components/Graph.vue";
 export default {
   name: "app",
   components: {
     NewChart: defineAsyncComponent(() => import("./components/NewChart.vue")),
     Chart,
+    //Graph,
   },
   data: function () {
     return {
@@ -29,6 +33,8 @@ export default {
       nodes: [],
       datashapes: [],
       datalinks: [],
+      newNode: { id: 100, y: 0, x: 0, text: "hola", vy: 0, vx: 0, index: 0 },
+      newLink: { text: "I am alink", source: 100, target: 1 },
     };
   },
   created() {
@@ -50,8 +56,11 @@ export default {
       let response = await axios.get("./dots.json");
       this.nodes = response.data;
     },
+    addData() {
+      this.datashapes= [...this.datashapes, this.newNode]
+      this.datalinks= [...this.datalinks, this.newLink]
+    },
   },
-  
 };
 </script>
 
