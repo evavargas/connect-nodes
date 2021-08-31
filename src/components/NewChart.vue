@@ -1,8 +1,8 @@
 <template>
   <!-- <div class="canvasData" id="canvasData" v-if="datashapes"></div> -->
   <div ref="resizeRef">
-    <svg ref="svgRef">
-      <g class="graph"></g>
+    <svg ref="svgRef" class="svgRef">
+      <g class="graph" transform="translate(100,100)"></g>
     </svg>
   </div>
 </template>
@@ -27,7 +27,6 @@ export default {
       const svg = d3.select(svgRef.value);
       //this g is the container of graph
       var g = svg.select(".graph");
-
       //group of lines
       var allLinks = g.append("g").attr("class", "allLinkGroup");
 
@@ -41,7 +40,7 @@ export default {
             [0, 0],
             [600, 600],
           ])
-          .scaleExtent([1, 8])
+          .scaleExtent([1, 10])
           .on("zoom", zoomed)
       );
       function zoomed() {
@@ -53,7 +52,8 @@ export default {
       watchEffect(() => {
         //const { width, height } = resizeState.dimensions;
         var link, node;
-
+        //center graph
+        
         //links update
         link = allLinks
           .selectAll(".line")
@@ -77,15 +77,16 @@ export default {
         node
           .append("text")
           .text((d) => d.text)
-          .attr("text-anchor", "middle")
-          .attr("dominant-baseline", "end")
+          .attr("text-anchor", "start")
+          .attr("dominant-baseline", "auto")
           .attr("font-size", "8px")
-          .attr("x", (d) => d.x)
-          .attr("y", (d) => d.y)
+          .attr("x",0)
+          .attr("y",6)
 
         const simulation = d3
           .forceSimulation()
           .nodes(props.datashapes)
+          //.force("center", d3.forceCenter(600 / 2, 600 / 2))
           .force(
             "link",
             d3
@@ -120,12 +121,10 @@ export default {
         simulation.alphaTarget(0.8).restart()
       }
     }
-        function dragged() {
-          d3.select(this)
-            .attr("x", (d) => (d.x += d3.event.dx))
-            .attr("y", (d) => (d.y += d3.event.dy));
-          simulation.alphaTarget(0.3).restart();
-        }
+        function dragged (d) {
+      d.fx = d3.event.x
+      d.fy = d3.event.y
+    }
         function dragended() {
           if (!d3.event.active) simulation.alphaTarget(0);
         }
@@ -163,6 +162,7 @@ svg {
   width: 600px;
   height: 600px;
 }
+
 .line {
   fill: #ffffff00;
   stroke: #f43b86;

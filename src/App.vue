@@ -1,7 +1,9 @@
 <template>
   <div>
     <div>
-      <button @click="addData">New Node</button>
+      <button @click="addNode">New Node</button>
+      <button @click="addLink">New  Link</button>
+      <button @click="addInfo">New  Info</button>
       <keep-alive>
         <NewChart :datashapes="datashapes" :datalinks="datalinks" />
       </keep-alive>
@@ -33,8 +35,8 @@ export default {
       nodes: [],
       datashapes: [],
       datalinks: [],
-      newNode: { id: 9, y: 10, x: 10, text: "hola", vy: 0, vx: 0, index:null },
-      newLink: { text: "I am alink", source: 9, target: 1 },
+      newNode: { id: 9, y: 0, x: 0, text: "example", vy: 0, vx: 0, index:null },
+      newLink: { text: "I am a link", source: 9, target: 1 },
     };
   },
   created() {
@@ -56,10 +58,12 @@ export default {
       let response = await axios.get("./dots.json");
       this.nodes = response.data;
     },
-    addData() {
+    addNode() {
       this.datashapes= [...this.datashapes, this.newNode]
-      this.datalinks= [...this.datalinks, this.newLink]
     },
+    addLink(){
+      this.datalinks= [...this.datalinks, this.newLink]
+    }
   },
 };
 </script>
@@ -73,17 +77,5 @@ export default {
   color: #2c3e50;
   margin-top: 2rem;
 }
-.btn-addnode {
-  background-color: greenyellow;
-  width: 4rem;
-  border-color: hotpink;
-  border-style: solid;
-  border-width: 1px;
-}
-.form-addnode {
-  width: 8rem;
-}
-.form-addnode input {
-  width: 6rem;
-}
+
 </style>
