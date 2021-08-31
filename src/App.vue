@@ -33,8 +33,8 @@ export default {
       nodes: [],
       datashapes: [],
       datalinks: [],
-      newNode: { id: 100, y: 0, x: 0, text: "hola", vy: 0, vx: 0, index: 0 },
-      newLink: { text: "I am alink", source: 100, target: 1 },
+      newNode: { id: 9, y: 10, x: 10, text: "hola", vy: 0, vx: 0, index:null },
+      newLink: { text: "I am alink", source: 9, target: 1 },
     };
   },
   created() {
