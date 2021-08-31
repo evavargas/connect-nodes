@@ -1,5 +1,4 @@
 [
-    {"text":"I am alink", "source":0, "target":1},
     {"text":"I am alink", "source":1, "target":1},
     {"text":"I am alink", "source":2, "target":1},
     {"text":"I am alink", "source":3, "target":1},

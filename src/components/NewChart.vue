@@ -32,6 +32,8 @@ export default {
 
       var allNodes = g.append("g").attr("class", "allNodeGroup");
 
+      var allTexts = g.append("g").attr("class", "allTextGroup");
+
       //zoom on area graph
       svg.call(
         d3
@@ -51,16 +53,25 @@ export default {
       // whenever any dependencies (like data, resizeState) change, call this!
       watchEffect(() => {
         //const { width, height } = resizeState.dimensions;
-        var link, node;
+        var link, node, linkText;
         //center graph
         
         //links update
         link = allLinks
           .selectAll(".line")
           .data(props.datalinks)
-          .join("line")
+          .enter()
+          .append("line")
           .classed("line", true)
 
+        //text of links
+        linkText = allTexts
+        .selectAll('text')
+        .data(props.datalinks)
+        .enter()
+        .append("text")
+        .text((d)=> d.text)
+        .attr("class", "linetext")
         //nodes updates
         node = allNodes
           .selectAll(".node")
@@ -79,7 +90,7 @@ export default {
           .text((d) => d.text)
           .attr("text-anchor", "start")
           .attr("dominant-baseline", "auto")
-          .attr("font-size", "8px")
+          .attr("class", "nodetext")
           .attr("x",0)
           .attr("y",6)
 
@@ -102,6 +113,9 @@ export default {
             .attr("y1", (d) => d.source.y)
             .attr("x2", (d) => d.target.x)
             .attr("y2", (d) => d.target.y);
+          linkText
+        .attr('x', function (d) { return (d.source.x + d.target.x) / 2 })
+        .attr('y', function (d) { return (d.source.y + d.target.y) / 2 })
           node.attr("transform", function (d) {
             return "translate(" + d.x + "," + d.y + ")";
           });
@@ -149,20 +163,20 @@ export default {
   stroke: #3d087b;
   width: 30px;
   height: 20px;
-  color: black;
-}
-.node .rect {
-  fill: #ffe35f;
-  stroke: #3d087b;
-  width: 30px;
-  height: 20px;
-  color: black;
 }
 svg {
   width: 600px;
   height: 600px;
 }
-
+.linetext{
+  color: #f43b86;
+}
+.nodetext{
+  color: #3d087b;
+}
+.linetext, .nodetext{
+  font-size: 8px;
+}
 .line {
   fill: #ffffff00;
   stroke: #f43b86;
