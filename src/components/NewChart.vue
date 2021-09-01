@@ -1,8 +1,7 @@
 <template>
-  <!-- <div class="canvasData" id="canvasData" v-if="datashapes"></div> -->
   <div ref="resizeRef">
     <svg ref="svgRef" class="svgRef">
-      <g class="graph" transform="translate(100,100)"></g>
+      <g class="graph"></g>
     </svg>
   </div>
 </template>
@@ -10,7 +9,6 @@
 <script>
 import { onMounted, ref, watchEffect } from "vue";
 import * as d3 from "d3";
-//import useResizeObserver from "@/use/resizeObserver";
 
 export default {
   name: "NewChart",
@@ -18,9 +16,9 @@ export default {
   setup(props) {
     // create ref to pass to D3 for DOM manipulation
     const svgRef = ref(null);
-
-    // create another ref to observe resizing, since observing SVGs doesn't work!
-    //const { resizeRef, resizeState } = useResizeObserver();
+    //width and heigt for rect of nodes
+    const width = 60;
+    const height = 40;
 
     onMounted(() => {
       // pass ref with DOM element to D3, when mounted (DOM available)
@@ -29,9 +27,9 @@ export default {
       var g = svg.select(".graph");
       //group of lines
       var allLinks = g.append("g").attr("class", "allLinkGroup");
-
+      //group of nodes
       var allNodes = g.append("g").attr("class", "allNodeGroup");
-
+      //group of text of lines
       var allTexts = g.append("g").attr("class", "allTextGroup");
 
       //zoom on area graph
@@ -40,49 +38,49 @@ export default {
           .zoom()
           .extent([
             [0, 0],
-            [600, 600],
+            [width * 10, height * 10],
           ])
           .scaleExtent([1, 10])
           .on("zoom", zoomed)
       );
       function zoomed() {
-        console.log(g);
         g.attr("transform", d3.event.transform);
       }
 
-      // whenever any dependencies (like data, resizeState) change, call this!
+      // whenever any dependencies (like data) change, call this!
       watchEffect(() => {
-        //const { width, height } = resizeState.dimensions;
         var link, node, linkText;
-        //center graph
-        
-        //links update
+        //join links to graph
         link = allLinks
           .selectAll(".line")
           .data(props.datalinks)
           .enter()
           .append("line")
-          .classed("line", true)
+          .classed("line", true);
 
         //text of links
         linkText = allTexts
-        .selectAll('text')
-        .data(props.datalinks)
-        .enter()
-        .append("text")
-        .text((d)=> d.text)
-        .attr("class", "linetext")
-        //nodes updates
+          .selectAll("text")
+          .data(props.datalinks)
+          .enter()
+          .append("text")
+          .text((d) => d.text)
+          .attr("class", "linetext");
+
+        //join nodes to graph
         node = allNodes
           .selectAll(".node")
           .data(props.datashapes)
           .enter()
           .append("g")
-          .attr("class", "node")
+          .attr("class", "node");
+
         //joinning square to nodes
         node
           .append("svg:rect")
           .attr("class", "rect")
+          .attr("width", width + "px")
+          .attr("height", height + "px");
 
         //joinning text to node
         node
@@ -91,13 +89,18 @@ export default {
           .attr("text-anchor", "start")
           .attr("dominant-baseline", "auto")
           .attr("class", "nodetext")
-          .attr("x",0)
-          .attr("y",6)
+          .attr("x", 0)
+          .attr("y", 8);
 
         const simulation = d3
           .forceSimulation()
+          // add some collision detection so they don't overlap
+          .force("collide", d3.forceCollide().radius(30))
+          // and draw them around the centre of the space
+          .force("center", d3.forceCenter(width * 5, height * 5))
+          //selecting nodes for simulation
           .nodes(props.datashapes)
-          //.force("center", d3.forceCenter(600 / 2, 600 / 2))
+          //selecting links for simulation
           .force(
             "link",
             d3
@@ -108,14 +111,21 @@ export default {
           .on("tick", tick);
 
         function tick() {
+          //where the node line is pinned
           link
-            .attr("x1", (d) => d.source.x)
-            .attr("y1", (d) => d.source.y)
-            .attr("x2", (d) => d.target.x)
+            .attr("x1", (d) => d.source.x + width / 2)
+            .attr("y1", (d) => d.source.y + height)
+            .attr("x2", (d) => d.target.x + width / 2)
             .attr("y2", (d) => d.target.y);
+          //text position relative to link
           linkText
-        .attr('x', function (d) { return (d.source.x + d.target.x) / 2 })
-        .attr('y', function (d) { return (d.source.y + d.target.y) / 2 })
+            .attr("x", function (d) {
+              return (d.source.x + d.target.x) / 2;
+            })
+            .attr("y", function (d) {
+              return (d.source.y + d.target.y) / 2;
+            });
+          //node position
           node.attr("transform", function (d) {
             return "translate(" + d.x + "," + d.y + ")";
           });
@@ -131,14 +141,14 @@ export default {
         node.call(drag);
 
         function dragstarted() {
-         if (!d3.event.active) {
-        simulation.alphaTarget(0.8).restart()
-      }
-    }
-        function dragged (d) {
-      d.fx = d3.event.x
-      d.fy = d3.event.y
-    }
+          if (!d3.event.active) {
+            simulation.alphaTarget(0.8).restart();
+          }
+        }
+        function dragged(d) {
+          d.fx = d3.event.x;
+          d.fy = d3.event.y;
+        }
         function dragended() {
           if (!d3.event.active) simulation.alphaTarget(0);
         }
@@ -150,43 +160,26 @@ export default {
 </script>
 
 <style>
-.canvasData {
-  background-color: #eeeeee;
-}
-.div {
-  background-color: rgb(255, 255, 255);
-  width: 60px;
-  height: 20px;
-}
 .rect {
-  fill: #ffe35f;
-  stroke: #3d087b;
-  width: 30px;
-  height: 20px;
+  fill: #f7e178;
+  stroke: #000000;
 }
 svg {
-  width: 600px;
-  height: 600px;
+  width: 80%;
+  height: 960px;
 }
-.linetext{
-  color: #f43b86;
+.linetext {
+  fill: #f43b86;
 }
-.nodetext{
-  color: #3d087b;
+.nodetext {
+  fill: #3d087b;
 }
-.linetext, .nodetext{
-  font-size: 8px;
+.linetext,
+.nodetext {
+  font-size: 9px;
 }
 .line {
   fill: #ffffff00;
   stroke: #f43b86;
-}
-
-.example {
-  width: 300px;
-  height: 300px;
-}
-.addButton {
-  background-color: rgb(236, 100, 100);
 }
 </style>
