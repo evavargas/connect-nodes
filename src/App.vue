@@ -61,6 +61,7 @@ export default {
       this.datalinks = [...this.datalinks, this.newLink];
     },
     addInfo() {
+      alert("In progres")
       //this.datashapes= [...this.datashapes, this.nodes]
       //this.datalinks= [...this.datalinks, this.newLink]
     },

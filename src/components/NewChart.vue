@@ -55,7 +55,8 @@ export default {
           .selectAll(".line")
           .data(props.datalinks)
           .enter()
-          .append("line")
+          //.append("line") for tick
+          .append("path") //for ticked
           .classed("line", true);
 
         //text of links
@@ -97,7 +98,7 @@ export default {
           // add some collision detection so they don't overlap
           .force("collide", d3.forceCollide().radius(30))
           // and draw them around the centre of the space
-          .force("center", d3.forceCenter(width * 5, height * 5))
+          //.force("center", d3.forceCenter(width * 5, height * 5))
           //selecting nodes for simulation
           .nodes(props.datashapes)
           //selecting links for simulation
@@ -106,18 +107,11 @@ export default {
             d3
               .forceLink(props.datalinks)
               .id((d) => d.id)
-              .distance(100)
+              .distance(120)
           )
-          .on("tick", tick);
-
-        function tick() {
-          //where the node line is pinned
-          link
-            .attr("x1", (d) => d.source.x + width / 2)
-            .attr("y1", (d) => d.source.y + height)
-            .attr("x2", (d) => d.target.x + width / 2)
-            .attr("y2", (d) => d.target.y);
-          //text position relative to link
+          .on("tick", ticked);
+        function ticked(){
+          link.attr("d", positionLink);
           linkText
             .attr("x", function (d) {
               return (d.source.x + d.target.x) / 2;
@@ -125,11 +119,63 @@ export default {
             .attr("y", function (d) {
               return (d.source.y + d.target.y) / 2;
             });
-          //node position
-          node.attr("transform", function (d) {
-            return "translate(" + d.x + "," + d.y + ")";
-          });
+          node.attr("transform", positionNode);
         }
+        function positionLink(d){
+          var offset = 30;
+
+          var midpoint_x = (d.source.x + d.target.x) / 2;
+          var midpoint_y = (d.source.y + d.target.y) / 2;
+  
+          var dx = (d.target.x - d.source.x);
+          var dy = (d.target.y - d.source.y);
+  
+          var normalise = Math.sqrt((dx * dx) + (dy * dy));
+  
+          var offSetX = midpoint_x + offset*(dy/normalise);
+          var offSetY = midpoint_y - offset*(dx/normalise);
+  
+          return "M" + (d.source.x+ width /2) + "," + (d.source.y+height) +
+              "S" + offSetX + "," + offSetY +
+              " " + (d.target.x + width /2)+ "," + d.target.y
+        }
+        // move the node based on forces calculations
+    function positionNode(d) {
+        // keep the node within the boundaries of the svg
+        if (d.x < 0) {
+            d.x = 0
+        }
+        if (d.y < 0) {
+            d.y = 0
+        }
+        if (d.x > 1000) {
+            d.x = 1000
+        }
+        if (d.y > 1000) {
+            d.y = 1000
+        }
+        return "translate(" + d.x + "," + d.y + ")";
+    }
+        // function tick() {
+        //   //where the node line is pinned
+        //   link
+        //     .attr("x1", (d) => d.source.x + width / 2)
+        //     .attr("y1", (d) => d.source.y + height)
+        //     .attr("x2", (d) => d.target.x + width / 2)
+        //     .attr("y2", (d) => d.target.y);
+        //   //text position relative to link
+        //   linkText
+        //     .attr("x", function (d) {
+        //       return (d.source.x + d.target.x) / 2;
+        //     })
+        //     .attr("y", function (d) {
+        //       return (d.source.y + d.target.y) / 2;
+        //     });
+        //   //node position
+        //   node.attr("transform", function (d) {
+        //     return "translate(" + d.x + "," + d.y + ")";
+        //   });
+        // }
         //mouse events
         const drag = d3
           .drag()
