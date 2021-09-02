@@ -24,15 +24,13 @@ export default {
       datashapes: [],
       datalinks: [],
       newNode: {
-        id: 9,
+        id: Math.floor(Math.random() * (100 - 9)) + 9,
         y: 0,
         x: 0,
         text: "example",
-        vy: 0,
-        vx: 0,
         index: null,
       },
-      newLink: { text: "I am a link", source: 9, target: 1 },
+      newLink: { text: "I am a link", source: Math.floor(Math.random() * (9 - 0)) + 0, target: Math.floor(Math.random() * (9 - 0)) + 0},
     };
   },
   created() {

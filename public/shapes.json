@@ -1,11 +1,11 @@
 [
-    {"id": 0  ,"y":0, "x":0, "vy":0, "vx":0,  "text":"Hello"},
-    {"id": 1  ,"y":0, "x":0, "vy":0, "vx":0,   "text":"How"},
-    {"id": 2  ,"y":0, "x":0, "vy":0, "vx":0,   "text":"Are"},
-    {"id": 3  ,"y":0, "x":0, "vy":0, "vx":0,   "text":"The"},
-    {"id": 4  ,"y":0, "x":0, "vy":0, "vx":0,   "text":"Wheater"},
-    {"id": 5  ,"y":0, "x":0, "vy":0, "vx":0,   "text":"Are"},
-    {"id": 6  ,"y":0, "x":0, "vy":0, "vx":0,  "text":"You a text too long?"},
-    {"id": 7  ,"y":0, "x":0, "vy":0, "vx":0,  "text":"We need"},
-    {"id": 8  ,"y":0, "x":0, "vy":0, "vx":0,   "text":"Optimize this"}
+    {"id": 0  ,"y":0, "x":0, "text":"Hello"},
+    {"id": 1  ,"y":0, "x":0,  "text":"How"},
+    {"id": 2  ,"y":0, "x":0,  "text":"Are"},
+    {"id": 3  ,"y":0, "x":0,  "text":"The"},
+    {"id": 4  ,"y":0, "x":0,  "text":"Wheater"},
+    {"id": 5  ,"y":0, "x":0,  "text":"Are"},
+    {"id": 6  ,"y":0, "x":0, "text":"You a text too long?"},
+    {"id": 7  ,"y":0, "x":0, "text":"We need"},
+    {"id": 8  ,"y":0, "x":0,  "text":"Optimize this"}
 ]

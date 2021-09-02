@@ -13,6 +13,7 @@ import * as d3 from "d3";
 export default {
   name: "NewChart",
   props: { datashapes: Array, datalinks: Array },
+
   setup(props) {
     // create ref to pass to D3 for DOM manipulation
     const svgRef = ref(null);
@@ -20,17 +21,40 @@ export default {
     const width = 60;
     const height = 40;
 
+    
     onMounted(() => {
       // pass ref with DOM element to D3, when mounted (DOM available)
       const svg = d3.select(svgRef.value);
       //this g is the container of graph
       var g = svg.select(".graph");
+      //svg marker for arrow
+      var defsarrow = g.append("svg:defs");
       //group of lines
       var allLinks = g.append("g").attr("class", "allLinkGroup");
       //group of nodes
       var allNodes = g.append("g").attr("class", "allNodeGroup");
       //group of text of lines
       var allTexts = g.append("g").attr("class", "allTextGroup");
+
+      //to arrow
+      defsarrow
+        .selectAll("marker")
+        .data(["end"])
+        .enter()
+        .append("svg:marker")
+        .attr("id", function () {
+          return "marker_" + "arrow";
+        })
+        .attr("markerHeight", 15)
+        .attr("markerWidth", 15)
+        .attr("markerUnits", "strokeWidth")
+        .attr("orient", "auto")
+        .attr("class", "arrow")
+        .attr("refX", 0)
+        .attr("refY", 0)
+        .attr("viewBox", "-5 -5 10 10")
+        .append("svg:path")
+        .attr("d", "M 0,0 m -5,-5 L 5,0 L -5,5 Z");
 
       //zoom on area graph
       svg.call(
@@ -57,7 +81,11 @@ export default {
           .enter()
           //.append("line") for tick
           .append("path") //for ticked
-          .classed("line", true);
+          .classed("line", true)
+          //adding arrow
+          .attr("marker-end", function () {
+            return "url(#marker_" + "arrow" + ")";
+          });
 
         //text of links
         linkText = allTexts
@@ -110,8 +138,11 @@ export default {
               .distance(120)
           )
           .on("tick", ticked);
-        function ticked(){
+        function ticked() {
+          //curve the link
           link.attr("d", positionLink);
+
+          //adding text to links
           linkText
             .attr("x", function (d) {
               return (d.source.x + d.target.x) / 2;
@@ -119,63 +150,56 @@ export default {
             .attr("y", function (d) {
               return (d.source.y + d.target.y) / 2;
             });
+          //position of nodes linked
           node.attr("transform", positionNode);
         }
-        function positionLink(d){
+        function positionLink(d) {
           var offset = 30;
 
           var midpoint_x = (d.source.x + d.target.x) / 2;
           var midpoint_y = (d.source.y + d.target.y) / 2;
-  
-          var dx = (d.target.x - d.source.x);
-          var dy = (d.target.y - d.source.y);
-  
-          var normalise = Math.sqrt((dx * dx) + (dy * dy));
-  
-          var offSetX = midpoint_x + offset*(dy/normalise);
-          var offSetY = midpoint_y - offset*(dx/normalise);
-  
-          return "M" + (d.source.x+ width /2) + "," + (d.source.y+height) +
-              "S" + offSetX + "," + offSetY +
-              " " + (d.target.x + width /2)+ "," + d.target.y
+
+          var dx = d.target.x - d.source.x;
+          var dy = d.target.y - d.source.y;
+
+          var normalise = Math.sqrt(dx * dx + dy * dy);
+
+          var offSetX = midpoint_x + offset * (dy / normalise);
+          var offSetY = midpoint_y - offset * (dx / normalise);
+
+          return (
+            "M" +
+            (d.source.x + width / 2) +
+            "," +
+            (d.source.y + height) +
+            "S" +
+            offSetX +
+            "," +
+            offSetY +
+            " " +
+            (d.target.x + width / 2) +
+            "," +
+            d.target.y
+          );
         }
         // move the node based on forces calculations
-    function positionNode(d) {
-        // keep the node within the boundaries of the svg
-        if (d.x < 0) {
-            d.x = 0
+        function positionNode(d) {
+          // keep the node within the boundaries of the svg
+          if (d.x < 0) {
+            d.x = 0;
+          }
+          if (d.y < 0) {
+            d.y = 0;
+          }
+          if (d.x > 1000) {
+            d.x = 1000;
+          }
+          if (d.y > 1000) {
+            d.y = 1000;
+          }
+          return "translate(" + d.x + "," + d.y + ")";
         }
-        if (d.y < 0) {
-            d.y = 0
-        }
-        if (d.x > 1000) {
-            d.x = 1000
-        }
-        if (d.y > 1000) {
-            d.y = 1000
-        }
-        return "translate(" + d.x + "," + d.y + ")";
-    }
-        // function tick() {
-        //   //where the node line is pinned
-        //   link
-        //     .attr("x1", (d) => d.source.x + width / 2)
-        //     .attr("y1", (d) => d.source.y + height)
-        //     .attr("x2", (d) => d.target.x + width / 2)
-        //     .attr("y2", (d) => d.target.y);
-        //   //text position relative to link
-        //   linkText
-        //     .attr("x", function (d) {
-        //       return (d.source.x + d.target.x) / 2;
-        //     })
-        //     .attr("y", function (d) {
-        //       return (d.source.y + d.target.y) / 2;
-        //     });
-        //   //node position
-        //   node.attr("transform", function (d) {
-        //     return "translate(" + d.x + "," + d.y + ")";
-        //   });
-        // }
+
         //mouse events
         const drag = d3
           .drag()
@@ -227,5 +251,9 @@ svg {
 .line {
   fill: #ffffff00;
   stroke: #f43b86;
+}
+.arrow {
+  fill: aquamarine;
+  stroke: blue;
 }
 </style>
