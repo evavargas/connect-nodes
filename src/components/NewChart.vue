@@ -18,12 +18,11 @@ export default {
     // create ref to pass to D3 for DOM manipulation
     const svgRef = ref(null);
     const refShape = ref(props.datashapes);
-    //const refLink = ref(props.datalinks)
+    const refLink = ref(props.datalinks);
     //width and heigt for rect of nodes
     const width = 60;
     const height = 40;
 
-    
     onMounted(() => {
       // pass ref with DOM element to D3, when mounted (DOM available)
       const svg = d3.select(svgRef.value);
@@ -72,14 +71,14 @@ export default {
       function zoomed() {
         g.attr("transform", d3.event.transform);
       }
-      
+
       // whenever any dependencies (like data) change, call this!
       watchEffect(() => {
         var link, node, linkText;
         //join links to graph
         link = allLinks
           .selectAll(".line")
-          .data(props.datalinks)
+          .data(refLink.value)
           .enter()
           //.append("line") for tick
           .append("path") //for ticked
@@ -92,7 +91,7 @@ export default {
         //text of links
         linkText = allTexts
           .selectAll("text")
-          .data(props.datalinks)
+          .data(refLink.value)
           .enter()
           .append("text")
           .text((d) => d.text)
@@ -101,7 +100,7 @@ export default {
         //join nodes to graph
         node = allNodes
           .selectAll(".node")
-          .data(props.datashapes)
+          .data(refShape.value)
           .enter()
           .append("g")
           .attr("class", "node");
@@ -130,12 +129,12 @@ export default {
           // and draw them around the centre of the space
           //.force("center", d3.forceCenter(width * 5, height * 5))
           //selecting nodes for simulation
-          .nodes(props.datashapes)
+          .nodes(refShape.value)
           //selecting links for simulation
           .force(
             "link",
             d3
-              .forceLink(props.datalinks)
+              .forceLink(refLink.value)
               .id((d) => d.id)
               .distance(120)
           )
@@ -202,7 +201,7 @@ export default {
           return "translate(" + d.x + "," + d.y + ")";
         }
         //addNode
-        
+
         //mouse events
         const drag = d3
           .drag()
@@ -226,21 +225,20 @@ export default {
           if (!d3.event.active) simulation.alphaTarget(0);
         }
 
-        function addNode(x){
-          console.log("click")
-          refShape.value.push(x)
+        function addNode(x) {
+          console.log("click");
+          refShape.value.push(x);
         }
-        svg.on("click", function(){
+        svg.on("click", function () {
           if (!d3.event.active)
-          addNode({
-        id: refShape.value.length+1,
-        y: 0,
-        x: 0,
-        text: "example",
-        index: null,
-      })
-        }
-        )
+            addNode({
+              id: refShape.value.length + 1,
+              y: 0,
+              x: 0,
+              text: "example",
+              index: null,
+            });
+        });
       });
     });
     return { svgRef };
@@ -249,28 +247,28 @@ export default {
 </script>
 
 <style>
-.svgRef{
-  background-color: #F7F6F2;
+.svgRef {
+  background-color: #f7f6f2;
 }
 svg {
   width: 80%;
   height: 960px;
 }
-svg:hover{
+svg:hover {
   cursor: crosshair;
 }
-.node:hover{
+.node:hover {
   cursor: grab;
 }
-.graph{
-cursor: move;
+.graph {
+  cursor: move;
 }
 .rect {
   fill: #f7e178;
   stroke: black;
 }
 .rect:active {
-    cursor: grabbing;
+  cursor: grabbing;
 }
 .linetext {
   fill: #f43b86;
