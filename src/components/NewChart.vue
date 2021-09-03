@@ -1,5 +1,5 @@
 <template>
-  <div ref="resizeRef">
+  <div ref="resizeRef" class="resizeRef">
     <svg ref="svgRef" class="svgRef">
       <g class="graph"></g>
     </svg>
@@ -17,6 +17,8 @@ export default {
   setup(props) {
     // create ref to pass to D3 for DOM manipulation
     const svgRef = ref(null);
+    const refShape = ref(props.datashapes);
+    //const refLink = ref(props.datalinks)
     //width and heigt for rect of nodes
     const width = 60;
     const height = 40;
@@ -70,7 +72,7 @@ export default {
       function zoomed() {
         g.attr("transform", d3.event.transform);
       }
-
+      
       // whenever any dependencies (like data) change, call this!
       watchEffect(() => {
         var link, node, linkText;
@@ -199,7 +201,8 @@ export default {
           }
           return "translate(" + d.x + "," + d.y + ")";
         }
-
+        //addNode
+        
         //mouse events
         const drag = d3
           .drag()
@@ -212,7 +215,7 @@ export default {
 
         function dragstarted() {
           if (!d3.event.active) {
-            simulation.alphaTarget(0.8).restart();
+            simulation.alphaTarget(0.3).restart();
           }
         }
         function dragged(d) {
@@ -222,6 +225,22 @@ export default {
         function dragended() {
           if (!d3.event.active) simulation.alphaTarget(0);
         }
+
+        function addNode(x){
+          console.log("click")
+          refShape.value.push(x)
+        }
+        svg.on("click", function(){
+          if (!d3.event.active)
+          addNode({
+        id: refShape.value.length+1,
+        y: 0,
+        x: 0,
+        text: "example",
+        index: null,
+      })
+        }
+        )
       });
     });
     return { svgRef };
@@ -230,13 +249,28 @@ export default {
 </script>
 
 <style>
-.rect {
-  fill: #f7e178;
-  stroke: #000000;
+.svgRef{
+  background-color: #F7F6F2;
 }
 svg {
   width: 80%;
   height: 960px;
+}
+svg:hover{
+  cursor: crosshair;
+}
+.node:hover{
+  cursor: grab;
+}
+.graph{
+cursor: move;
+}
+.rect {
+  fill: #f7e178;
+  stroke: black;
+}
+.rect:active {
+    cursor: grabbing;
 }
 .linetext {
   fill: #f43b86;

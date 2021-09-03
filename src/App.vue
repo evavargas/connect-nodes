@@ -1,7 +1,8 @@
 <template>
   <div>
     <h2>{{ msg }}</h2>
-    <button @click="addNode">New Node</button>
+    <p>Click on canvas to add Nodes</p>
+    <!-- <button @click="addNode">New Node</button> -->
     <button @click="addLink">New Link</button>
     <button @click="addInfo">New Info</button>
     <keep-alive>
