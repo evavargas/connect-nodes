@@ -21,10 +21,18 @@ export default {
     //width and heigt for rect of nodes
     const width = 60;
     const height = 40;
+    //size for graph
     var margin = { top: 20, right: 90, bottom: 30, left: 90 },
       widthGraph = 960 - margin.left - margin.right,
       heightGraph = 500 - margin.top - margin.bottom;
 
+    //elements for new link function
+    var selected_node,
+      selected_target_node,
+      selected_link,
+      new_line,
+      should_drag = false,
+      drawing_line = false;
     onMounted(() => {
       // pass ref with DOM element to D3, when mounted (DOM available)
       const svg = d3.select(svgRef.value);
@@ -111,6 +119,13 @@ export default {
 
         //.nodes(refShape.value)
         .on("tick", ticked);
+      //mouse and key events
+      d3.select(window)
+        .on("mousemove", mousemove)
+        .on("mouseup", mouseup)
+        // .on("keydown", keydown)
+        // .on("keyup", keyup);
+      svg.on("mousedown", mousedown);
       //links
       link = allLinks
         .selectAll(".line")
@@ -120,7 +135,11 @@ export default {
         .classed("line", true)
         .attr("marker-end", function () {
           return "url(#marker_" + "arrow" + ")";
-        });
+        })
+        .classed("selected", function (d) {
+          return d === selected_link;
+        })
+        .on("mousedown", line_mousedown);
       //text of links
       linkText = allTexts
         .selectAll("text")
@@ -137,7 +156,16 @@ export default {
         .enter()
         .append("g")
         .attr("class", "node")
-        .call(drag);
+        .classed("selected", function (d) {
+          return d === selected_node;
+        })
+        .classed("selected_target", function (d) {
+          return d === selected_target_node;
+        })
+        .call(drag)
+        .on("mousedown", node_mousedown)
+    .on("mouseover", node_mouseover)
+    .on("mouseout", node_mouseout);
 
       //joinning square to nodes
       node
@@ -184,7 +212,11 @@ export default {
             .classed("line", true)
             .attr("marker-end", function () {
               return "url(#marker_" + "arrow" + ")";
-            });
+            })
+            .classed("selected", function (d) {
+              return d === selected_link;
+            })
+            .on("mousedown", line_mousedown);
 
         link = linkEnter.merge(linkU);
         link.exit().remove();
@@ -204,7 +236,16 @@ export default {
             .enter()
             .append("g")
             .call(drag)
-            .attr("class", "node");
+            .attr("class", "node")
+            .classed("selected", function (d) {
+              return d === selected_node;
+            })
+            .classed("selected_target", function (d) {
+              return d === selected_target_node;
+            })
+            .on("mousedown", node_mousedown)
+            .on("mouseover", node_mouseover)
+            .on("mouseout", node_mouseout);
         nodeEnter
           .append("svg:rect")
           .attr("class", "rect")
@@ -265,33 +306,184 @@ export default {
       function addLink(x) {
         refLink.value.push(x);
       }
-      svg.on("dblclick", () => {
-        if(d3.event.ctrlKey){
-          var position = d3.mouse(svg.node());
-          addNode({
-            id: refShape.value.length + 1,
-            x: position[0],
-            y: position[1],
-            text: "New Node",
-            index: null,
-          });
-          update();
-          simulation.alphaTarget(0.3).restart();
+      // select target node for new node connection
+      function node_mouseover(d) {
+        if (drawing_line && d !== selected_node) {
+          // highlight and select target node
+          selected_target_node = d;
         }
-        
-      });
-      svg.on("click", () => {
-        
-          var new_link = {
-            source: 5,
-            target: 8,
-            text: "Nuevo Link",
-          };
-          addLink(new_link);
+      }
+
+      function node_mouseout() {
+        if (drawing_line) {
+          selected_target_node = null;
+        }
+      }
+
+      // select node / start drag
+      function node_mousedown(d) {
+        if (!drawing_line) {
+          selected_node = d;
+          selected_link = null;
+        }
+        if (!should_drag) {
+          d3.event.stopPropagation();
+          drawing_line = true;
+        }
+        d.fixed = true;
+        simulation.stop();
+        update();
+      }
+
+      // select line
+      function line_mousedown(d) {
+        selected_link = d;
+        selected_node = null;
+        update();
+      }
+
+      // draw yellow "new connector" line
+      function mousemove() {
+        if (drawing_line && !should_drag) {
+          var m = d3.mouse(svg.node());
+          var x = m[0] -80;
+          var y = m[1]-20;
+          // debounce - only start drawing line if it gets a bit big
+          var dx = selected_node.x - x;
+          var dy = selected_node.y - y;
+          if (Math.sqrt(dx * dx + dy * dy) > 10) {
+            // draw a line
+            if (!new_line) {
+              new_line = allLinks.append("line").attr("class", "new_line");
+            }
+            new_line
+              .attr("x1", selected_node.x)
+              .attr("y1", selected_node.y)
+              .attr("x2", x)
+              .attr("y2", y);
+          }
+        }
+        update();
+      }
+
+      // add a new disconnected node
+      function mousedown() {
+        var m = d3.mouse(svg.node());
+        addNode({
+          x: m[0],
+          y: m[1],
+          text: "Node" + " " + refShape.value.length,
+          id: refShape.value.length,
+        });
+        selected_link = null;
+        simulation.stop();
+        update();
+        simulation.restart();
+      }
+
+      // end node select / add new connected node
+      function mouseup() {
+        drawing_line = false;
+        if (new_line) {
+          if (selected_target_node) {
+            selected_target_node.fixed = false;
+            var new_node = selected_target_node;
+          } else {
+            var m = d3.mouse(svg.node());
+            new_node = {
+              x: m[0],
+              y: m[1],
+              text: "Nodo" + " " + refShape.value.length,
+              id: refShape.value.length,
+            };
+            addNode(new_node);
+          }
+          selected_node.fixed = false;
+          addLink({ source: selected_node, target: new_node, text: "hi" });
+          selected_node = selected_target_node = null;
           update();
-          simulation.alphaTarget(0.3).restart();
-        
-      });
+          setTimeout(function () {
+            new_line.remove();
+            new_line = null;
+            simulation.restart();
+          }, 300);
+        }
+      }
+
+      // function keyup() {
+      //   switch (d3.event.keyCode) {
+      //     case 16: {
+      //       // shift
+      //       should_drag = false;
+      //       update();
+      //       simulation.restart();
+      //     }
+      //   }
+      // }
+
+      // select for dragging node with shift; delete node with backspace
+      // function keydown() {
+      //   switch (d3.event.keyCode) {
+      //     case 8: // backspace
+      //     case 46: {
+      //       // delete
+      //       if (selected_node) {
+      //         // deal with nodes
+      //         var i = refShape.value.indexOf(selected_node);
+      //         refShape.value.splice(i, 1);
+      //         // find links to/from this node, and delete them too
+      //         var new_links = [];
+      //         refLink.value.forEach(function (l) {
+      //           if (l.source !== selected_node && l.target !== selected_node) {
+      //             new_links.push(l);
+      //           }
+      //         });
+      //         refLink.value = new_links;
+      //         selected_node = refShape.value.length
+      //           ? refShape.value[i > 0 ? i - 1 : 0]
+      //           : null;
+      //       } else if (selected_link) {
+      //         // deal with links
+      //         i = refLink.value.indexOf(selected_link);
+      //         refLink.value.splice(i, 1);
+      //         selected_link = refLink.value.length
+      //           ? refLink.value[i > 0 ? i - 1 : 0]
+      //           : null;
+      //       }
+      //       update();
+      //       break;
+      //     }
+      //     case 16: {
+      //       // shift
+      //       should_drag = true;
+      //       break;
+      //     }
+      //   }
+      // }
+      //   svg.on("dblclick", () => {
+      //     if (d3.event.ctrlKey) {
+      //       var position = d3.mouse(svg.node());
+      //       addNode({
+      //         id: refShape.value.length + 1,
+      //         x: position[0],
+      //         y: position[1],
+      //         text: "New Node",
+      //         index: null,
+      //       });
+      //       update();
+      //       simulation.alphaTarget(0.3).restart();
+      //     }
+      //   });
+      //   svg.on("click", () => {
+      //     var new_link = {
+      //       source: 5,
+      //       target: 8,
+      //       text: "Nuevo Link",
+      //     };
+      //     addLink(new_link);
+      //     update();
+      //     simulation.alphaTarget(0.3).restart();
+      //   });
     });
 
     return { svgRef };
@@ -336,5 +528,19 @@ svg:hover {
 .arrow {
   fill: aquamarine;
   stroke: blue;
+}
+.new_line {
+  stroke: yellow;
+  stroke-opacity: 0.8;
+  stroke-width: 6px;
+}
+
+.selected {
+  stroke: red;
+  stroke-opacity: 1;
+}
+.selected_target rect {
+  fill: pink;
+  stroke-width: 1.5px;
 }
 </style>

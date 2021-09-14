@@ -1,8 +1,9 @@
 <template>
   <div>
     <h2>{{ msg }}</h2>
-    <p>Click on canvas to add a link</p>
-    <p>Double click + ctrl on canvas to add a node</p>
+    <p>Ctrl + Click on canvas to add a Node</p>
+    <p>To link nodes: Ctrl + click to select source and mouseup to select target</p>
+    <p>Also drag and drop available</p>
     <!-- <button @click="addNode">New Node</button> -->
     <!--<button @click="addLink">New Link</button>-->
     <button @click="addInfo">New Info</button>
@@ -25,14 +26,18 @@ export default {
       msg: "💃🕺",
       datashapes: [],
       datalinks: [],
-      newNode: {
-        id: Math.floor(Math.random() * (100 - 9)) + 9,
-        y: 0,
-        x: 0,
-        text: "example",
-        index: null,
-      },
-      newLink: { text: "I am a link", source: Math.floor(Math.random() * (9 - 0)) + 0, target: Math.floor(Math.random() * (9 - 0)) + 0},
+      // newNode: {
+      //   id: Math.floor(Math.random() * (100 - 9)) + 9,
+      //   y: 0,
+      //   x: 0,
+      //   text: "example",
+      //   index: null,
+      // },
+      // newLink: {
+      //   text: "I am a link",
+      //   source: Math.floor(Math.random() * (9 - 0)) + 0,
+      //   target: Math.floor(Math.random() * (9 - 0)) + 0,
+      // },
     };
   },
   created() {
@@ -54,14 +59,14 @@ export default {
       this.nodes = response.data;
     },
 
-    addNode() {
-      this.datashapes = [...this.datashapes, this.newNode];
-    },
-    addLink() {
-      this.datalinks = [...this.datalinks, this.newLink];
-    },
+    // addNode() {
+    //   this.datashapes = [...this.datashapes, this.newNode];
+    // },
+    // addLink() {
+    //   this.datalinks = [...this.datalinks, this.newLink];
+    // },
     addInfo() {
-      alert("In progres")
+      alert("In progress");
       //this.datashapes= [...this.datashapes, this.nodes]
       //this.datalinks= [...this.datalinks, this.newLink]
     },
