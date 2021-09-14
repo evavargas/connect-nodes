@@ -1,11 +1,11 @@
 [
-    {"id": 0   , "x":570  , "y":54  , "text":"First"},
-    {"id": 1   , "x":438  , "y":85  , "text":"Second"},
+    {"id": 0   , "x":570  , "y":54   , "text":"First"},
+    {"id": 1   , "x":438  , "y":85   , "text":"Second"},
     {"id": 2   , "x":539  , "y":168  , "text":"Third"},
     {"id": 3   , "x":317  , "y":108  , "text":"Fourth"},
-    {"id": 4   , "x":459 , "y":180  , "text":"Fifth"},
+    {"id": 4   , "x":459  , "y":180  , "text":"Fifth"},
     {"id": 5   , "x":400  , "y":120  , "text":"Sixth"},
     {"id": 6   , "x":638  , "y":101  , "text":"Seventh"},
-    {"id": 7   , "x":213  , "y":62  , "text":"Eighth"},
+    {"id": 7   , "x":213  , "y":62   , "text":"Eighth"},
     {"id": 8   , "x":840  , "y":100  , "text":"Ninth"}
 ]

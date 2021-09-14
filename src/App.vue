@@ -1,9 +1,10 @@
 <template>
   <div>
     <h2>{{ msg }}</h2>
-    <p>Click on canvas to add Nodes</p>
+    <p>Click on canvas to add a link</p>
+    <p>Double click + ctrl on canvas to add a node</p>
     <!-- <button @click="addNode">New Node</button> -->
-    <button @click="addLink">New Link</button>
+    <!--<button @click="addLink">New Link</button>-->
     <button @click="addInfo">New Info</button>
     <keep-alive>
       <NewChart :datashapes="datashapes" :datalinks="datalinks" />
