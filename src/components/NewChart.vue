@@ -1,10 +1,10 @@
 <template>
-  <div style="padding:2rem">
+  <div style="padding: 2rem">
     <div ref="resizeRef" class="resizeRef">
-    <svg ref="svgRef" class="svgRef">
-      <g class="graph"></g>
-    </svg>
-  </div>
+      <svg ref="svgRef" class="svgRef">
+        <g class="graph"></g>
+      </svg>
+    </div>
   </div>
 </template>
 
@@ -24,8 +24,8 @@ export default {
     const width = 60;
     const height = 40;
     //size for graph
-    var widthGraph = 960 
-    var heightGraph = 500
+    var widthGraph = 960;
+    var heightGraph = 500;
     //elements for new link function
     var selected_node,
       selected_target_node,
@@ -36,9 +36,7 @@ export default {
     onMounted(() => {
       // pass ref with DOM element to D3, when mounted (DOM available)
       const svg = d3.select(svgRef.value);
-      svg
-        .attr("height", heightGraph)
-        .attr("width", widthGraph );
+      svg.attr("height", heightGraph).attr("width", widthGraph);
       //this g is the container of graph
       var g = svg.select(".graph");
       //svg marker for arrow
@@ -71,19 +69,19 @@ export default {
         .attr("d", "M 0,0 m -5,-5 L 5,0 L -5,5 Z");
       //drag
       function dragstarted(d) {
-        console.log("dragstarted")
+        console.log("dragstarted");
         if (!d3.event.active) {
           simulation.alphaTarget(0.3).restart();
           (d.fx = d.x), (d.fy = d.y);
         }
       }
       function dragged(d) {
-        console.log("dragged")
+        console.log("dragged");
         d.fx = d3.event.x;
         d.fy = d3.event.y;
       }
       function dragended() {
-        console.log("dragended")
+        console.log("dragended");
         if (!d3.event.active) simulation.alphaTarget(0);
       }
       //mouse events
@@ -123,12 +121,14 @@ export default {
         //.nodes(refShape.value)
         .on("tick", ticked);
       //mouse and key events
-      d3.select(window).on("mousemove", mousemove).on("mouseup", mouseup);
-      // .on("keydown", keydown)
-      // .on("keyup", keyup);
+      d3.select(window)
+        .on("mousemove", mousemove)
+        .on("mouseup", mouseup)
+        .on("keydown", keydown);
+
       //context menu to add node
       svg.on("contextmenu", mousedown);
-      
+
       //links
       link = allLinks
         .selectAll(".line")
@@ -155,16 +155,16 @@ export default {
       //node
       node = allNodes
         .selectAll(".node")
-        .data(refShape.value)
-        .enter()
-        .append("g")
-        .attr("class", "node")
+        .data(refShape.value, (d)=> d.id)
         .classed("selected", function (d) {
           return d === selected_node;
         })
         .classed("selected_target", function (d) {
           return d === selected_target_node;
         })
+        .enter()
+        .append("g")
+        .attr("class", "node")
         .call(drag)
         .on("mousedown", node_mousedown)
         .on("mouseover", node_mouseover)
@@ -311,7 +311,7 @@ export default {
       }
       // select target node for new node connection
       function node_mouseover(d) {
-        console.log("node_mouseover")
+        console.log("node_mouseover");
         if (drawing_line && d !== selected_node) {
           // highlight and select target node
           selected_target_node = d;
@@ -319,7 +319,7 @@ export default {
       }
 
       function node_mouseout() {
-        console.log("node_mouseout")
+        console.log("node_mouseout");
         if (drawing_line) {
           selected_target_node = null;
         }
@@ -327,7 +327,7 @@ export default {
 
       // select node / start drag
       function node_mousedown(d) {
-        console.log("node_mousedown")
+        console.log("node_mousedown");
         if (!drawing_line) {
           selected_node = d;
           selected_link = null;
@@ -343,15 +343,16 @@ export default {
 
       // select line
       function line_mousedown(d) {
-        console.log("line_mousedown")
+        console.log("line_mousedown");
         selected_link = d;
         selected_node = null;
+        console.log(d)
         update();
       }
 
       // draw yellow "new connector" line
       function mousemove() {
-        console.log("mousemove")
+        console.log("mousemove");
         if (drawing_line && !should_drag) {
           var m = d3.mouse(svg.node());
           var x = m[0];
@@ -376,8 +377,8 @@ export default {
 
       // add a new disconnected node
       function mousedown() {
-        d3.event.preventDefault()
-        console.log("mousedown")
+        d3.event.preventDefault();
+        console.log("mousedown");
         var m = d3.mouse(svg.node());
         addNode({
           x: m[0],
@@ -393,7 +394,7 @@ export default {
 
       // end node select / add new connected node
       function mouseup() {
-        console.log("mouseup")
+        console.log("mouseup");
         drawing_line = false;
         if (new_line) {
           if (selected_target_node) {
@@ -421,80 +422,41 @@ export default {
         }
       }
 
-      // function keyup() {
-      //   switch (d3.event.keyCode) {
-      //     case 16: {
-      //       // shift
-      //       should_drag = false;
-      //       update();
-      //       simulation.restart();
-      //     }
-      //   }
-      // }
-
       // select for dragging node with shift; delete node with backspace
-      // function keydown() {
-      //   switch (d3.event.keyCode) {
-      //     case 8: // backspace
-      //     case 46: {
-      //       // delete
-      //       if (selected_node) {
-      //         // deal with nodes
-      //         var i = refShape.value.indexOf(selected_node);
-      //         refShape.value.splice(i, 1);
-      //         // find links to/from this node, and delete them too
-      //         var new_links = [];
-      //         refLink.value.forEach(function (l) {
-      //           if (l.source !== selected_node && l.target !== selected_node) {
-      //             new_links.push(l);
-      //           }
-      //         });
-      //         refLink.value = new_links;
-      //         selected_node = refShape.value.length
-      //           ? refShape.value[i > 0 ? i - 1 : 0]
-      //           : null;
-      //       } else if (selected_link) {
-      //         // deal with links
-      //         i = refLink.value.indexOf(selected_link);
-      //         refLink.value.splice(i, 1);
-      //         selected_link = refLink.value.length
-      //           ? refLink.value[i > 0 ? i - 1 : 0]
-      //           : null;
-      //       }
-      //       update();
-      //       break;
-      //     }
-      //     case 16: {
-      //       // shift
-      //       should_drag = true;
-      //       break;
-      //     }
-      //   }
-      // }
-      //   svg.on("dblclick", () => {
-      //     if (d3.event.ctrlKey) {
-      //       var position = d3.mouse(svg.node());
-      //       addNode({
-      //         id: refShape.value.length + 1,
-      //         x: position[0],
-      //         y: position[1],
-      //         text: "New Node",
-      //         index: null,
-      //       });
-      //       update();
-      //       simulation.alphaTarget(0.3).restart();
-      //     }
-      //   });
-      //   svg.on("click", () => {
-      //     var new_link = {
-      //       source: 5,
-      //       target: 8,
-      //       text: "Nuevo Link",
-      //     };
-      //     addLink(new_link);
-      //     update();
-      //     simulation.alphaTarget(0.3).restart();
-      //   });
+      function keydown() {
+        console.log("keydown")
+        switch (d3.event.keyCode) {
+          case 8: // backspace
+          case 46: {
+            // delete
+            if (selected_node) {
+              console.log(selected_node)
+              // deal with nodes
+              var i = refShape.value.indexOf(selected_node);
+              refShape.value.splice(i, 1);
+              // find links to/from this node, and delete them too
+              var new_links = [];
+              refLink.value.forEach(function (l) {
+                if (l.source !== selected_node && l.target !== selected_node) {
+                  new_links.push(l);
+                }
+              });
+              refLink.value = new_links;
+              selected_node = refShape.value.length ? refShape.value[i > 0 ? i - 1 : 0] : null;
+            } else if (selected_link) {
+              console.log(selected_link)
+              // deal with links
+              i = refLink.value.indexOf(selected_link);
+              console.log(i)
+              refLink.value.splice(i, 1);
+              selected_link = refLink.value.length ? refLink.value[i > 0 ? i - 1 : 0] : null;
+            }
+            update();
+            simulation.restart()
+            break;
+          }
+        }
+      }
     });
 
     return { svgRef };
@@ -516,17 +478,21 @@ svg:hover {
   cursor: move;
 }
 .rect {
-  fill: #F6E4A4;
-  stroke: #CDBD82;
+  fill: #f6e4a4;
+  stroke: #cdbd82;
 }
 .rect:active {
   cursor: grabbing;
 }
 .linetext {
-  fill: #D3A16E;
+  fill: #d3a16e;
+}
+.linetext:hover,
+.nodetext {
+  cursor: text;
 }
 .nodetext {
-  fill: #8C866E;
+  fill: #8c866e;
 }
 .linetext,
 .nodetext {
@@ -534,23 +500,30 @@ svg:hover {
 }
 .line {
   fill: #ffffff00;
-  stroke: #F9BEB0;
+  stroke: #f9beb0;
+}
+.line:hover {
+  cursor: pointer;
 }
 .arrow {
-  fill: #CDBD82;
-  stroke: #CDBD82;
+  fill: #cdbd82;
+  stroke: #cdbd82;
 }
 .new_line {
   stroke: yellow;
   stroke-opacity: 0.8;
-  stroke-width: 6px;
+  stroke-width: 4px;
 }
 
-.selected {
+path.selected {
   stroke: red;
   stroke-opacity: 1;
 }
-.selected_target rect {
+.node.selected {
+  fill: red;
+  stroke-width: 1.5px;
+}
+.selected_target {
   fill: pink;
   stroke-width: 1.5px;
 }
