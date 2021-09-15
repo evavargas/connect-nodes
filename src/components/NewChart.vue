@@ -71,21 +71,25 @@ export default {
         .attr("d", "M 0,0 m -5,-5 L 5,0 L -5,5 Z");
       //drag
       function dragstarted(d) {
+        console.log("dragstarted")
         if (!d3.event.active) {
           simulation.alphaTarget(0.3).restart();
           (d.fx = d.x), (d.fy = d.y);
         }
       }
       function dragged(d) {
+        console.log("dragged")
         d.fx = d3.event.x;
         d.fy = d3.event.y;
       }
       function dragended() {
+        console.log("dragended")
         if (!d3.event.active) simulation.alphaTarget(0);
       }
       //mouse events
       const drag = d3
         .drag()
+        .filter(() => d3.event.ctrlKey || d3.event.metaKey)
         .on("start", dragstarted)
         .on("drag", dragged)
         .on("end", dragended);
@@ -122,7 +126,9 @@ export default {
       d3.select(window).on("mousemove", mousemove).on("mouseup", mouseup);
       // .on("keydown", keydown)
       // .on("keyup", keyup);
-      svg.on("mousedown", mousedown);
+      //context menu to add node
+      svg.on("contextmenu", mousedown);
+      
       //links
       link = allLinks
         .selectAll(".line")
@@ -297,7 +303,7 @@ export default {
       }
 
       function addNode(x) {
-        console.log("node");
+        console.log("adding node");
         refShape.value.push(x);
       }
       function addLink(x) {
@@ -305,6 +311,7 @@ export default {
       }
       // select target node for new node connection
       function node_mouseover(d) {
+        console.log("node_mouseover")
         if (drawing_line && d !== selected_node) {
           // highlight and select target node
           selected_target_node = d;
@@ -312,6 +319,7 @@ export default {
       }
 
       function node_mouseout() {
+        console.log("node_mouseout")
         if (drawing_line) {
           selected_target_node = null;
         }
@@ -319,6 +327,7 @@ export default {
 
       // select node / start drag
       function node_mousedown(d) {
+        console.log("node_mousedown")
         if (!drawing_line) {
           selected_node = d;
           selected_link = null;
@@ -334,6 +343,7 @@ export default {
 
       // select line
       function line_mousedown(d) {
+        console.log("line_mousedown")
         selected_link = d;
         selected_node = null;
         update();
@@ -341,6 +351,7 @@ export default {
 
       // draw yellow "new connector" line
       function mousemove() {
+        console.log("mousemove")
         if (drawing_line && !should_drag) {
           var m = d3.mouse(svg.node());
           var x = m[0];
@@ -365,6 +376,8 @@ export default {
 
       // add a new disconnected node
       function mousedown() {
+        d3.event.preventDefault()
+        console.log("mousedown")
         var m = d3.mouse(svg.node());
         addNode({
           x: m[0],
@@ -380,6 +393,7 @@ export default {
 
       // end node select / add new connected node
       function mouseup() {
+        console.log("mouseup")
         drawing_line = false;
         if (new_line) {
           if (selected_target_node) {

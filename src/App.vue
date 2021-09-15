@@ -1,7 +1,7 @@
 <template>
   <div>
     <h2>{{ msg }}</h2>
-    <p>Ctrl + Click on canvas to add a Node. To link nodes: Ctrl + click to select source and mouseup to select target. Also drag and drop available</p>
+    <p class="message">To add a node: (1) right click. (Context menu) <br>To link nodes: drag from a node to another to connect nodes. Additionaly if not target selected, It creates a new node <br> Drag and drop: (1)Ctrl + left click or (2)command + left lick to move nodes </p>
     <!-- <button @click="addNode">New Node</button> -->
     <!--<button @click="addLink">New Link</button>-->
     <button @click="addInfo">New Info</button>
@@ -77,5 +77,8 @@ export default {
   font-family: Avenir, Helvetica, Arial, sans-serif;
   text-align: center;
   margin-top: 2rem;
+}
+.message{
+  text-align: left;
 }
 </style>
