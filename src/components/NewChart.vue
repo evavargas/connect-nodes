@@ -1,8 +1,10 @@
 <template>
-  <div ref="resizeRef" class="resizeRef">
+  <div style="padding:2rem">
+    <div ref="resizeRef" class="resizeRef">
     <svg ref="svgRef" class="svgRef">
       <g class="graph"></g>
     </svg>
+  </div>
   </div>
 </template>
 
@@ -22,10 +24,8 @@ export default {
     const width = 60;
     const height = 40;
     //size for graph
-    var margin = { top: 20, right: 90, bottom: 30, left: 90 },
-      widthGraph = 960 - margin.left - margin.right,
-      heightGraph = 500 - margin.top - margin.bottom;
-
+    var widthGraph = 960 
+    var heightGraph = 500
     //elements for new link function
     var selected_node,
       selected_target_node,
@@ -37,11 +37,10 @@ export default {
       // pass ref with DOM element to D3, when mounted (DOM available)
       const svg = d3.select(svgRef.value);
       svg
-        .attr("height", heightGraph + margin.top + margin.bottom)
-        .attr("width", widthGraph + margin.right + margin.left);
+        .attr("height", heightGraph)
+        .attr("width", widthGraph );
       //this g is the container of graph
       var g = svg.select(".graph");
-      g.attr("transform", "translate(" + margin.left + "," + margin.top + ")");
       //svg marker for arrow
       var defsarrow = g.append("svg:defs");
       //group of lines
@@ -120,11 +119,9 @@ export default {
         //.nodes(refShape.value)
         .on("tick", ticked);
       //mouse and key events
-      d3.select(window)
-        .on("mousemove", mousemove)
-        .on("mouseup", mouseup)
-        // .on("keydown", keydown)
-        // .on("keyup", keyup);
+      d3.select(window).on("mousemove", mousemove).on("mouseup", mouseup);
+      // .on("keydown", keydown)
+      // .on("keyup", keyup);
       svg.on("mousedown", mousedown);
       //links
       link = allLinks
@@ -164,8 +161,8 @@ export default {
         })
         .call(drag)
         .on("mousedown", node_mousedown)
-    .on("mouseover", node_mouseover)
-    .on("mouseout", node_mouseout);
+        .on("mouseover", node_mouseover)
+        .on("mouseout", node_mouseout);
 
       //joinning square to nodes
       node
@@ -346,8 +343,8 @@ export default {
       function mousemove() {
         if (drawing_line && !should_drag) {
           var m = d3.mouse(svg.node());
-          var x = m[0] -80;
-          var y = m[1]-20;
+          var x = m[0];
+          var y = m[1];
           // debounce - only start drawing line if it gets a bit big
           var dx = selected_node.x - x;
           var dy = selected_node.y - y;
