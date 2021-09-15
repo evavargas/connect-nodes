@@ -59,8 +59,8 @@ export default {
         .attr("id", function () {
           return "marker_" + "arrow";
         })
-        .attr("markerHeight", 15)
-        .attr("markerWidth", 15)
+        .attr("markerHeight", 10)
+        .attr("markerWidth", 10)
         .attr("markerUnits", "strokeWidth")
         .attr("orient", "auto")
         .attr("class", "arrow")
@@ -111,7 +111,7 @@ export default {
           d3
             .forceLink()
             .id((d) => d.id)
-            .distance(120)
+            .distance(135)
         )
         // add some collision detection so they don't overlap
         .force("collide", d3.forceCollide().radius(30))
@@ -263,7 +263,7 @@ export default {
       simulation.nodes(refShape.value).on("tick", ticked);
       simulation.force("link").links(refLink.value);
       function positionLink(d) {
-        var offset = 60;
+        var offset = 30;
 
         var midpoint_x = (d.source.x + d.target.x) / 2;
         var midpoint_y = (d.source.y + d.target.y) / 2;
@@ -490,7 +490,7 @@ export default {
 
 <style>
 .svgRef {
-  background-color: #f7f6f2;
+  background-color: #fcfcfc;
 }
 svg:hover {
   cursor: crosshair;
@@ -502,17 +502,17 @@ svg:hover {
   cursor: move;
 }
 .rect {
-  fill: #f7e178;
-  stroke: black;
+  fill: #F6E4A4;
+  stroke: #CDBD82;
 }
 .rect:active {
   cursor: grabbing;
 }
 .linetext {
-  fill: #f43b86;
+  fill: #D3A16E;
 }
 .nodetext {
-  fill: #3d087b;
+  fill: #8C866E;
 }
 .linetext,
 .nodetext {
@@ -520,11 +520,11 @@ svg:hover {
 }
 .line {
   fill: #ffffff00;
-  stroke: #f43b86;
+  stroke: #F9BEB0;
 }
 .arrow {
-  fill: aquamarine;
-  stroke: blue;
+  fill: #CDBD82;
+  stroke: #CDBD82;
 }
 .new_line {
   stroke: yellow;

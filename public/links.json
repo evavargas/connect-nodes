@@ -1,10 +1,10 @@
 [
-    {"source":1, "target":0, "text":"I am a link"},
-    {"source":2, "target":1, "text":"Hi"},
-    {"source":3, "target":2, "text":"I "},
-    {"source":4, "target":2, "text":"link"},
-    {"source":5, "target":3, "text":"Two nodes"},
-    {"source":6, "target":4, "text":"Here"},
-    {"source":7, "target":5, "text":"Lorem"},
-    {"source":8, "target":6, "text":"Ipsum"}
+    {"source":0, "target":1, "text":"New line"},
+    {"source":0, "target":2, "text":"New line"},
+    {"source":1, "target":3, "text":"New line"},
+    {"source":1, "target":4, "text":"New line"},
+    {"source":1, "target":5, "text":"New line"},
+    {"source":2, "target":6, "text":"New line"},
+    {"source":2, "target":7, "text":"New line"},
+    {"source":7, "target":8, "text":"New line"}
 ]

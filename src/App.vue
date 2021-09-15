@@ -1,9 +1,7 @@
 <template>
   <div>
     <h2>{{ msg }}</h2>
-    <p>Ctrl + Click on canvas to add a Node</p>
-    <p>To link nodes: Ctrl + click to select source and mouseup to select target</p>
-    <p>Also drag and drop available</p>
+    <p>Ctrl + Click on canvas to add a Node. To link nodes: Ctrl + click to select source and mouseup to select target. Also drag and drop available</p>
     <!-- <button @click="addNode">New Node</button> -->
     <!--<button @click="addLink">New Link</button>-->
     <button @click="addInfo">New Info</button>
