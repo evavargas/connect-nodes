@@ -54,9 +54,7 @@ export default {
         .data(["end"])
         .enter()
         .append("svg:marker")
-        .attr("id", function () {
-          return "marker_" + "arrow";
-        })
+        .attr("id",  "marker_ arrow")
         .attr("markerHeight", 10)
         .attr("markerWidth", 10)
         .attr("markerUnits", "strokeWidth")
@@ -107,19 +105,18 @@ export default {
       }
       //active simulation
       var simulation = d3
-        .forceSimulation()
+        .forceSimulation(refShape.value)
         .force(
           "link",
           d3
-            .forceLink()
+            .forceLink(refLink.value)
             .id((d) => d.id)
             .distance(135)
         )
         // add some collision detection so they don't overlap
         .force("collide", d3.forceCollide().radius(30))
-
-        //.nodes(refShape.value)
         .on("tick", ticked);
+      
       //mouse and key events
       d3.select(window)
         .on("mousemove", mousemove)
@@ -187,21 +184,7 @@ export default {
         .attr("x", 0)
         .attr("y", 8);
 
-      function ticked() {
-        //curve the link
-        link.attr("d", positionLink);
-
-        //adding text to links
-        linkText
-          .attr("x", function (d) {
-            return (d.source.x + d.target.x) / 2;
-          })
-          .attr("y", function (d) {
-            return (d.source.y + d.target.y) / 2;
-          });
-        //position of nodes linked
-        node.attr("transform", positionNode);
-      }
+      
       function update() {
         //Redefine and restart simulation
         simulation.nodes(refShape.value).on("tick", ticked);
@@ -264,10 +247,28 @@ export default {
           .attr("y", 8);
         node = nodeEnter.merge(nodeU);
         node.exit().remove();
-      }
 
       simulation.nodes(refShape.value).on("tick", ticked);
       simulation.force("link").links(refLink.value);
+      simulation.restart()
+      }
+
+      
+      function ticked() {
+        //curve the link
+        link.attr("d", positionLink);
+
+        //adding text to links
+        linkText
+          .attr("x", function (d) {
+            return (d.source.x + d.target.x) / 2;
+          })
+          .attr("y", function (d) {
+            return (d.source.y + d.target.y) / 2;
+          });
+        //position of nodes linked
+        node.attr("transform", positionNode);
+      }
       function positionLink(d) {
         var offset = 30;
 
@@ -389,7 +390,6 @@ export default {
         selected_link = null;
         simulation.stop();
         update();
-        simulation.restart();
       }
 
       // end node select / add new connected node
@@ -452,7 +452,6 @@ export default {
               selected_link = refLink.value.length ? refLink.value[i > 0 ? i - 1 : 0] : null;
             }
             update();
-            simulation.restart()
             break;
           }
         }
