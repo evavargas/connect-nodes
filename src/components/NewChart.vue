@@ -54,7 +54,7 @@ export default {
         .data(["end"])
         .enter()
         .append("svg:marker")
-        .attr("id",  "marker_ arrow")
+        .attr("id", "marker_arrow")
         .attr("markerHeight", 10)
         .attr("markerWidth", 10)
         .attr("markerUnits", "strokeWidth")
@@ -116,12 +116,13 @@ export default {
         // add some collision detection so they don't overlap
         .force("collide", d3.forceCollide().radius(30))
         .on("tick", ticked);
-      
+
       //mouse and key events
       d3.select(window)
         .on("mousemove", mousemove)
         .on("mouseup", mouseup)
-        .on("keydown", keydown);
+        .on("keydown", keydown)
+        .on("keyup", keyup);
 
       //context menu to add node
       svg.on("contextmenu", mousedown);
@@ -131,14 +132,10 @@ export default {
         .selectAll(".line")
         .data(refLink.value)
         .enter()
-        .append("path") //for ticked
+        .append("path")
         .classed("line", true)
-        .attr("marker-end", function () {
-          return "url(#marker_" + "arrow" + ")";
-        })
-        .classed("selected", function (d) {
-          return d === selected_link;
-        })
+        .attr("marker-end", "url(#marker_arrow)")
+        .classed("selected", (d) => d === selected_link)
         .on("mousedown", line_mousedown);
       //text of links
       linkText = allTexts
@@ -152,13 +149,9 @@ export default {
       //node
       node = allNodes
         .selectAll(".node")
-        .data(refShape.value, (d)=> d.id)
-        .classed("selected", function (d) {
-          return d === selected_node;
-        })
-        .classed("selected_target", function (d) {
-          return d === selected_target_node;
-        })
+        .data(refShape.value, (d) => d.id)
+        .classed("selected", (d) => d === selected_node)
+        .classed("selected_target", (d) => d === selected_target_node)
         .enter()
         .append("g")
         .attr("class", "node")
@@ -184,24 +177,16 @@ export default {
         .attr("x", 0)
         .attr("y", 8);
 
-      
       function update() {
-        //Redefine and restart simulation
-        simulation.nodes(refShape.value).on("tick", ticked);
-        simulation.force("link").links(refLink.value);
-
+        //revew update
         //update Links
         var linkU = allLinks.selectAll(".line").data(refLink.value),
           linkEnter = linkU
             .enter()
             .append("path")
             .classed("line", true)
-            .attr("marker-end", function () {
-              return "url(#marker_" + "arrow" + ")";
-            })
-            .classed("selected", function (d) {
-              return d === selected_link;
-            })
+            .attr("marker-end", "url(#marker_arrow)")
+            .classed("selected", (d) => d === selected_link)
             .on("mousedown", line_mousedown);
 
         link = linkEnter.merge(linkU);
@@ -223,12 +208,8 @@ export default {
             .append("g")
             .call(drag)
             .attr("class", "node")
-            .classed("selected", function (d) {
-              return d === selected_node;
-            })
-            .classed("selected_target", function (d) {
-              return d === selected_target_node;
-            })
+            .classed("selected", (d) => d === selected_node)
+            .classed("selected_target", (d) => d === selected_target_node)
             .on("mousedown", node_mousedown)
             .on("mouseover", node_mouseover)
             .on("mouseout", node_mouseout);
@@ -247,27 +228,28 @@ export default {
           .attr("y", 8);
         node = nodeEnter.merge(nodeU);
         node.exit().remove();
-
-      simulation.nodes(refShape.value).on("tick", ticked);
-      simulation.force("link").links(refLink.value);
-      simulation.restart()
+        //Redefine and restart simulation
+        simulation.nodes(refShape.value).on("tick", ticked);
+        simulation.force(
+          "link",
+          d3
+            .forceLink(refLink.value)
+            .id((d) => d.id)
+            .distance(135)
+        );
+        simulation.restart();
       }
 
-      
       function ticked() {
         //curve the link
         link.attr("d", positionLink);
 
         //adding text to links
         linkText
-          .attr("x", function (d) {
-            return (d.source.x + d.target.x) / 2;
-          })
-          .attr("y", function (d) {
-            return (d.source.y + d.target.y) / 2;
-          });
+          .attr("x", (d) => (d.source.x + d.target.x) / 2)
+          .attr("y", (d) => (d.source.y + d.target.y) / 2);
         //position of nodes linked
-        node.attr("transform", positionNode);
+        node.attr("transform", (d) => "translate(" + d.x + "," + d.y + ")");
       }
       function positionLink(d) {
         var offset = 30;
@@ -298,16 +280,13 @@ export default {
           d.target.y
         );
       }
-      // move the node based on forces calculations
-      function positionNode(d) {
-        return "translate(" + d.x + "," + d.y + ")";
-      }
 
       function addNode(x) {
         console.log("adding node");
         refShape.value.push(x);
       }
       function addLink(x) {
+        console.log("adding link");
         refLink.value.push(x);
       }
       // select target node for new node connection
@@ -347,7 +326,7 @@ export default {
         console.log("line_mousedown");
         selected_link = d;
         selected_node = null;
-        console.log(d)
+        console.log(d);
         update();
       }
 
@@ -384,7 +363,7 @@ export default {
         addNode({
           x: m[0],
           y: m[1],
-          text: "Node" + " " + refShape.value.length,
+          text: "New Node" + " " + refShape.value.length,
           id: refShape.value.length,
         });
         selected_link = null;
@@ -405,13 +384,13 @@ export default {
             new_node = {
               x: m[0],
               y: m[1],
-              text: "Nodo" + " " + refShape.value.length,
+              text: "Node" + " " + refShape.value.length,
               id: refShape.value.length,
             };
             addNode(new_node);
           }
           selected_node.fixed = false;
-          addLink({ source: selected_node, target: new_node, text: "hi" });
+          addLink({ source: selected_node, target: new_node, text: "Node" + refLink.value.length });
           selected_node = selected_target_node = null;
           update();
           setTimeout(function () {
@@ -424,16 +403,18 @@ export default {
 
       // select for dragging node with shift; delete node with backspace
       function keydown() {
-        console.log("keydown")
+        console.log("keydown");
         switch (d3.event.keyCode) {
           case 8: // backspace
           case 46: {
             // delete
             if (selected_node) {
-              console.log(selected_node)
+              console.log(selected_node);
               // deal with nodes
               var i = refShape.value.indexOf(selected_node);
+              console.log(i);
               refShape.value.splice(i, 1);
+              console.log(refShape.value);
               // find links to/from this node, and delete them too
               var new_links = [];
               refLink.value.forEach(function (l) {
@@ -442,19 +423,31 @@ export default {
                 }
               });
               refLink.value = new_links;
-              selected_node = refShape.value.length ? refShape.value[i > 0 ? i - 1 : 0] : null;
+              console.log(refLink.value);
+              selected_node = refShape.value.length
+                ? refShape.value[i > 0 ? i - 1 : 0]
+                : null;
             } else if (selected_link) {
-              console.log(selected_link)
+              console.log(selected_link);
               // deal with links
               i = refLink.value.indexOf(selected_link);
-              console.log(i)
+              console.log(i);
               refLink.value.splice(i, 1);
-              selected_link = refLink.value.length ? refLink.value[i > 0 ? i - 1 : 0] : null;
+              console.log(refLink.value);
+              selected_link = refLink.value.length
+                ? refLink.value[i > 0 ? i - 1 : 0]
+                : null;
             }
             update();
+            console.log(refShape.value);
+            console.log(refLink.value);
             break;
           }
         }
+      }
+      function keyup() {
+        console.log("keyup");
+        simulation.restart();
       }
     });
 
