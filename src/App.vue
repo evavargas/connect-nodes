@@ -1,7 +1,7 @@
 <template>
   <div>
     <h2>{{ msg }}</h2>
-    <p class="message">To add a node: (1) right click. (Context menu) <br>To link nodes: drag from a node to another to connect nodes. Additionaly if not target selected, It creates a new node <br> Drag and drop: (1)Ctrl + left click or (2)command + left lick to move nodes <br>Press Spr / Backspace to delete nodes or lines </p>
+    <p class="message">To add a node: (1) right click. (Context menu) <br>To link nodes: drag from a node to another to connect nodes. Additionaly if not target selected, It creates a new node <br> Drag and drop: (1)Ctrl + left click or (2)command (Meta)+ left lick to move nodes <br>Press Supr / Backspace to delete nodes or lines </p>
     <!-- <button @click="addNode">New Node</button> -->
     <!--<button @click="addLink">New Link</button>-->
     <button @click="addInfo">New Info</button>

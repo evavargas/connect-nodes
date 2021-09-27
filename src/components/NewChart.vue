@@ -55,8 +55,8 @@ export default {
         .enter()
         .append("svg:marker")
         .attr("id", "marker_arrow")
-        .attr("markerHeight", 10)
-        .attr("markerWidth", 10)
+        .attr("markerHeight", 6)
+        .attr("markerWidth", 6)
         .attr("markerUnits", "strokeWidth")
         .attr("orient", "auto")
         .attr("class", "arrow")
@@ -69,7 +69,7 @@ export default {
       function dragstarted(d) {
         console.log("dragstarted");
         if (!d3.event.active) {
-          simulation.alphaTarget(0.3).restart();
+          simulation.alphaTarget(0.2).restart();
           (d.fx = d.x), (d.fy = d.y);
         }
       }
@@ -103,19 +103,17 @@ export default {
       function zoomed() {
         g.attr("transform", d3.event.transform);
       }
-      //active simulation
       var simulation = d3
-        .forceSimulation(refShape.value)
+        .forceSimulation()
         .force(
           "link",
           d3
-            .forceLink(refLink.value)
+            .forceLink()
             .id((d) => d.id)
             .distance(135)
         )
         // add some collision detection so they don't overlap
-        .force("collide", d3.forceCollide().radius(30))
-        .on("tick", ticked);
+        .force("collide", d3.forceCollide().radius(30));
 
       //mouse and key events
       d3.select(window)
@@ -127,108 +125,57 @@ export default {
       //context menu to add node
       svg.on("contextmenu", mousedown);
 
-      //links
-      link = allLinks
-        .selectAll(".line")
-        .data(refLink.value)
-        .enter()
-        .append("path")
-        .classed("line", true)
-        .attr("marker-end", "url(#marker_arrow)")
-        .classed("selected", (d) => d === selected_link)
-        .on("mousedown", line_mousedown);
-      //text of links
-      linkText = allTexts
-        .selectAll("text")
-        .data(refLink.value)
-        .enter()
-        .append("text")
-        .text((d) => d.text)
-        .attr("class", "linetext");
-
-      //node
-      node = allNodes
-        .selectAll(".node")
-        .data(refShape.value, (d) => d.id)
-        .classed("selected", (d) => d === selected_node)
-        .classed("selected_target", (d) => d === selected_target_node)
-        .enter()
-        .append("g")
-        .attr("class", "node")
-        .call(drag)
-        .on("mousedown", node_mousedown)
-        .on("mouseover", node_mouseover)
-        .on("mouseout", node_mouseout);
-
-      //joinning square to nodes
-      node
-        .append("svg:rect")
-        .attr("class", "rect")
-        .attr("width", width + "px")
-        .attr("height", height + "px");
-
-      //joinning text to node
-      node
-        .append("text")
-        .text((d) => d.text)
-        .attr("text-anchor", "start")
-        .attr("dominant-baseline", "auto")
-        .attr("class", "nodetext")
-        .attr("x", 0)
-        .attr("y", 8);
-
       function update() {
-        //revew update
-        //update Links
-        var linkU = allLinks.selectAll(".line").data(refLink.value),
-          linkEnter = linkU
-            .enter()
-            .append("path")
-            .classed("line", true)
-            .attr("marker-end", "url(#marker_arrow)")
-            .classed("selected", (d) => d === selected_link)
-            .on("mousedown", line_mousedown);
-
-        link = linkEnter.merge(linkU);
+        link = allLinks
+          .selectAll(".line")
+          .data(refLink.value)
+          .attr("d", positionLink)
+          .classed("selected", (d) => d === selected_link);
+        link
+          .enter()
+          .append("path")
+          .attr("class", "line")
+          .attr("marker-end", "url(#marker_arrow)")
+          .on("mousedown", line_mousedown);
         link.exit().remove();
 
-        var textU = allTexts.selectAll("text").data(refLink.value),
-          textEnter = textU
-            .enter()
-            .append("text")
-            .attr("class", "linetext")
-            .text((d) => d.text);
-
-        linkText = textEnter.merge(textU);
+        linkText = allTexts
+          .selectAll("text")
+          .data(refLink.value)
+          .text((d) => d.text);
+        linkText.enter().append("text").attr("class", "linetext");
         linkText.exit().remove();
 
-        var nodeU = allNodes.selectAll(".node").data(refShape.value),
-          nodeEnter = nodeU
-            .enter()
-            .append("g")
-            .call(drag)
-            .attr("class", "node")
-            .classed("selected", (d) => d === selected_node)
-            .classed("selected_target", (d) => d === selected_target_node)
-            .on("mousedown", node_mousedown)
-            .on("mouseover", node_mouseover)
-            .on("mouseout", node_mouseout);
-        nodeEnter
+        node = allNodes
+          .selectAll(".node")
+          .data(refShape.value, (d) => d.id)
+          .classed("selected", (d) => d === selected_node)
+          .classed("selected_target", (d) => d === selected_target_node);
+        var nodeg = node
+          .enter()
+          .append("g")
+          .attr("class", "node")
+          .call(drag)
+          .attr("transform", (d) => "translate(" + d.x + "," + d.y + ")");
+
+        nodeg
           .append("svg:rect")
           .attr("class", "rect")
           .attr("width", width + "px")
-          .attr("height", height + "px");
-        nodeEnter
-          .append("text")
+          .attr("height", height + "px")
+          .on("mousedown", node_mousedown)
+          .on("mouseover", node_mouseover)
+          .on("mouseout", node_mouseout);
+        nodeg
+          .append("svg:text")
           .text((d) => d.text)
-          .attr("text-anchor", "start")
-          .attr("dominant-baseline", "auto")
           .attr("class", "nodetext")
-          .attr("x", 0)
-          .attr("y", 8);
-        node = nodeEnter.merge(nodeU);
+          .append("text")
+          .attr("text-anchor", "start")
+          .attr("dominant-baseline", "auto");
+
         node.exit().remove();
-        //Redefine and restart simulation
+
         simulation.nodes(refShape.value).on("tick", ticked);
         simulation.force(
           "link",
@@ -361,14 +308,15 @@ export default {
         console.log("mousedown");
         var m = d3.mouse(svg.node());
         addNode({
+          id: refShape.value.length,
           x: m[0],
           y: m[1],
           text: "New Node" + " " + refShape.value.length,
-          id: refShape.value.length,
         });
         selected_link = null;
         simulation.stop();
         update();
+        simulation.tick();
       }
 
       // end node select / add new connected node
@@ -382,21 +330,25 @@ export default {
           } else {
             var m = d3.mouse(svg.node());
             new_node = {
+              id: refShape.value.length,
               x: m[0],
               y: m[1],
               text: "Node" + " " + refShape.value.length,
-              id: refShape.value.length,
             };
             addNode(new_node);
           }
           selected_node.fixed = false;
-          addLink({ source: selected_node, target: new_node, text: "Node" + refLink.value.length });
+          addLink({
+            source: selected_node,
+            target: new_node,
+            text: selected_node.id + "to" + new_node.id,
+          });
           selected_node = selected_target_node = null;
           update();
           setTimeout(function () {
             new_line.remove();
             new_line = null;
-            simulation.restart();
+            simulation.tick();
           }, 300);
         }
       }
@@ -443,11 +395,27 @@ export default {
             console.log(refLink.value);
             break;
           }
+          case 17: {
+            // Ctrl
+            should_drag = true;
+            break;
+          }
+          case 91: {
+            // Meta Right
+            should_drag = true;
+            break;
+          }
+          case 93: {
+            // Meta left
+            should_drag = true;
+            break;
+          }
         }
       }
       function keyup() {
         console.log("keyup");
-        simulation.restart();
+        should_drag = false;
+        simulation.tick();
       }
     });
 
@@ -469,7 +437,7 @@ svg:hover {
 .graph {
   cursor: move;
 }
-.rect {
+g.node .rect {
   fill: #f6e4a4;
   stroke: #cdbd82;
 }
@@ -493,6 +461,7 @@ svg:hover {
 .line {
   fill: #ffffff00;
   stroke: #f9beb0;
+  stroke-width: 2.4px;
 }
 .line:hover {
   cursor: pointer;
@@ -507,16 +476,16 @@ svg:hover {
   stroke-width: 4px;
 }
 
-path.selected {
+path.line.selected {
   stroke: red;
   stroke-opacity: 1;
 }
-.node.selected {
-  fill: red;
+g.node.selected rect.rect {
+  fill: #f9b411;
   stroke-width: 1.5px;
 }
-.selected_target {
-  fill: pink;
+g.node.selected_target rect.rect {
+  fill: #f6f3a2;
   stroke-width: 1.5px;
 }
 </style>
