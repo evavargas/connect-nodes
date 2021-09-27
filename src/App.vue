@@ -2,8 +2,7 @@
   <div>
     <h2>{{ msg }}</h2>
     <p class="message">To add a node: (1) right click. (Context menu) <br>To link nodes: drag from a node to another to connect nodes. Additionaly if not target selected, It creates a new node <br> Drag and drop: (1)Ctrl + left click or (2)command (Meta)+ left lick to move nodes <br>Press Supr / Backspace to delete nodes or lines </p>
-    <!-- <button @click="addNode">New Node</button> -->
-    <!--<button @click="addLink">New Link</button>-->
+
     <button @click="addInfo">New Info</button>
     <keep-alive>
       <NewChart :datashapes="datashapes" :datalinks="datalinks" />
@@ -24,18 +23,7 @@ export default {
       msg: "💃🕺",
       datashapes: [],
       datalinks: [],
-      // newNode: {
-      //   id: Math.floor(Math.random() * (100 - 9)) + 9,
-      //   y: 0,
-      //   x: 0,
-      //   text: "example",
-      //   index: null,
-      // },
-      // newLink: {
-      //   text: "I am a link",
-      //   source: Math.floor(Math.random() * (9 - 0)) + 0,
-      //   target: Math.floor(Math.random() * (9 - 0)) + 0,
-      // },
+
     };
   },
   created() {
@@ -60,13 +48,9 @@ export default {
     // addNode() {
     //   this.datashapes = [...this.datashapes, this.newNode];
     // },
-    // addLink() {
-    //   this.datalinks = [...this.datalinks, this.newLink];
-    // },
+
     addInfo() {
       alert("In progress");
-      //this.datashapes= [...this.datashapes, this.nodes]
-      //this.datalinks= [...this.datalinks, this.newLink]
     },
   },
 };

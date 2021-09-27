@@ -170,8 +170,9 @@ export default {
           .append("svg:text")
           .text((d) => d.text)
           .attr("class", "nodetext")
-          .append("text")
           .attr("text-anchor", "start")
+          .attr("x", 0)
+          .attr("y", 8)
           .attr("dominant-baseline", "auto");
 
         node.exit().remove();
@@ -311,7 +312,7 @@ export default {
           id: refShape.value.length,
           x: m[0],
           y: m[1],
-          text: "New Node" + " " + refShape.value.length,
+          text: "Text" + " " + refShape.value.length,
         });
         selected_link = null;
         simulation.stop();
@@ -333,7 +334,7 @@ export default {
               id: refShape.value.length,
               x: m[0],
               y: m[1],
-              text: "Node" + " " + refShape.value.length,
+              text: "Text" + " " + refShape.value.length,
             };
             addNode(new_node);
           }
@@ -341,7 +342,7 @@ export default {
           addLink({
             source: selected_node,
             target: new_node,
-            text: selected_node.id + "to" + new_node.id,
+            text: selected_node.id + " to " + new_node.id,
           });
           selected_node = selected_target_node = null;
           update();
