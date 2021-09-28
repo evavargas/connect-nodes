@@ -167,14 +167,29 @@ export default {
           .on("mouseover", node_mouseover)
           .on("mouseout", node_mouseout);
         nodeg
-          .append("svg:text")
-          .text((d) => d.text)
+          .append("foreignObject")
+          .html((d) => `<div style="width: ${width}px;">${d.text}</div>`)
+
           .attr("class", "nodetext")
           .attr("text-anchor", "start")
           .attr("x", 0)
-          .attr("y", 8)
+          .attr("y", 0)
+          .attr("width", width)
+          .attr("height", height - 2)
           .attr("dominant-baseline", "auto");
+        //.text((d) => d.text)
+        //
+        //           .attr("x", 0)
+        //           .attr("y", 2)
+        //
+        //
+        //           .append("xhtml:body")
+        //
 
+        //           .attr("class", "nodetext")
+        //           .attr("text-anchor", "start")
+
+        //           .attr("dominant-baseline", "auto");
         node.exit().remove();
 
         simulation.nodes(refShape.value).on("tick", ticked);
