@@ -1,11 +1,7 @@
 [
-    {"id": 0   , "x":447  , "y":37   , "text":"Freude, schöner Götterfunken Tochter aus Elysium"},
-    {"id": 1   , "x":323  , "y":123  , "text":"Wir betreten feuertrunken, Himmlische, dein Heiligtum"},
-    {"id": 2   , "x":587  , "y":127  , "text":"Deine Zauber binden wieder Was die Mode streng geteilt"},
-    {"id": 3   , "x":205  , "y":236  , "text":"Alle Menschen werden Brüder, Wo dein sanfter Flügel weilt"},
-    {"id": 4   , "x":325  , "y":234  , "text":"Wem der große Wurf gelungen, Eines Freundes Freund zu sein;"},
-    {"id": 5   , "x":425  , "y":235  , "text":"Text5"},
-    {"id": 6   , "x":659  , "y":234  , "text":"Text6"},
-    {"id": 7   , "x":530  , "y":236  , "text":"Text7"},
-    {"id": 8   , "x":465  , "y":352  , "text":"Text8"}
+    {"id": 0   , "x":427  , "y":59   , "text":"Freude, schöner Götterfunken Tochter aus Elysium"},
+    {"id": 1   , "x":332  , "y":149  , "text":"Wir betreten feuertrunken, Himmlische, dein Heiligtum"},
+    {"id": 2   , "x":570  , "y":148  , "text":"Deine Zauber binden wieder Was die Mode streng geteilt"},
+    {"id": 3   , "x":260  , "y":289  , "text":"Alle Menschen werden Brüder, Wo dein sanfter Flügel weilt"},
+    {"id": 4   , "x":411  , "y":286  , "text":"Wem der große Wurf gelungen, Eines Freundes Freund zu sein;"}
 ]

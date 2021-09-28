@@ -21,8 +21,8 @@ export default {
     var refShape = ref(props.datashapes);
     var refLink = ref(props.datalinks);
     //width and heigt for rect of nodes
-    const width = 60;
-    const height = 40;
+    const width = 68;
+    const height = 46;
     //size for graph
     var widthGraph = 960;
     var heightGraph = 500;
@@ -55,8 +55,8 @@ export default {
         .enter()
         .append("svg:marker")
         .attr("id", "marker_arrow")
-        .attr("markerHeight", 6)
-        .attr("markerWidth", 6)
+        .attr("markerHeight", 5)
+        .attr("markerWidth", 5)
         .attr("markerUnits", "strokeWidth")
         .attr("orient", "auto")
         .attr("class", "arrow")
@@ -110,10 +110,10 @@ export default {
           d3
             .forceLink()
             .id((d) => d.id)
-            .distance(135)
+            .distance(140)
         )
         // add some collision detection so they don't overlap
-        .force("collide", d3.forceCollide().radius(30));
+        .force("collide", d3.forceCollide().radius(20));
 
       //mouse and key events
       d3.select(window)
@@ -161,21 +161,21 @@ export default {
         nodeg
           .append("svg:rect")
           .attr("class", "rect")
-          .attr("width", width + "px")
-          .attr("height", height + "px")
+          .attr("width", (width+16) + "px")
+          .attr("height", (height+16) + "px")
           .on("mousedown", node_mousedown)
           .on("mouseover", node_mouseover)
           .on("mouseout", node_mouseout);
         nodeg
           .append("foreignObject")
-          .html((d) => `<div style="width: ${width}px;">${d.text}</div>`)
+          .html((d) => `<div style="width: ${width}px; height: ${height}px;">${d.text}</div>`)
 
           .attr("class", "nodetext")
           .attr("text-anchor", "start")
-          .attr("x", 0)
-          .attr("y", 0)
+          .attr("x", 8)
+          .attr("y", 8)
           .attr("width", width)
-          .attr("height", height - 2)
+          .attr("height", height)
           .attr("dominant-baseline", "auto");
         //.text((d) => d.text)
         //
@@ -442,7 +442,7 @@ export default {
 
 <style>
 .svgRef {
-  background-color: #fcfcfc;
+  background-color: #fcf0f0;
 }
 svg:hover {
   cursor: crosshair;
@@ -457,6 +457,9 @@ g.node .rect {
   fill: #f6e4a4;
   stroke: #cdbd82;
 }
+g.node .rect:hover{
+  stroke-width: 2px;
+}
 .rect:active {
   cursor: grabbing;
 }
@@ -469,6 +472,7 @@ g.node .rect {
 }
 .nodetext {
   fill: #8c866e;
+  background-color: #FFDCB1;
 }
 .linetext,
 .nodetext {
