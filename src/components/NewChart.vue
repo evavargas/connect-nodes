@@ -124,6 +124,10 @@ export default {
 
       //context menu to add node
       svg.on("contextmenu", mousedown);
+      // .on("click", ()=>{
+      //   selected_node= null;
+      //   selected_link= null;
+      // })
 
       function update() {
         link = allLinks
@@ -161,35 +165,24 @@ export default {
         nodeg
           .append("svg:rect")
           .attr("class", "rect")
-          .attr("width", (width+16) + "px")
-          .attr("height", (height+16) + "px")
+          .attr("width", width + 16 + "px")
+          .attr("height", height + 16 + "px")
           .on("mousedown", node_mousedown)
           .on("mouseover", node_mouseover)
           .on("mouseout", node_mouseout);
         nodeg
           .append("foreignObject")
-          .html((d) => `<div style="width: ${width}px; height: ${height}px;">${d.text}</div>`)
-
+          .attr("x", 6)
+          .attr("y", 6)
           .attr("class", "nodetext")
-          .attr("text-anchor", "start")
-          .attr("x", 8)
-          .attr("y", 8)
+          .attr("width", width+2)
+          .attr("height", height+2)
+          .html((d)=>`<textarea class="textarea-node" id="node${d.id}">${d.text}</textarea>` )
           .attr("width", width)
           .attr("height", height)
-          .attr("dominant-baseline", "auto");
-        //.text((d) => d.text)
-        //
-        //           .attr("x", 0)
-        //           .attr("y", 2)
-        //
-        //
-        //           .append("xhtml:body")
-        //
-
-        //           .attr("class", "nodetext")
-        //           .attr("text-anchor", "start")
-
-        //           .attr("dominant-baseline", "auto");
+          .attr("text-anchor", "start")
+          .attr("dominant-baseline", "auto")
+          .on("change", updateTextNode)
         node.exit().remove();
 
         simulation.nodes(refShape.value).on("tick", ticked);
@@ -252,6 +245,24 @@ export default {
         console.log("adding link");
         refLink.value.push(x);
       }
+       function updateTextNode() {
+
+         let textAreaId = d3.select(this).select(".textarea-node").attr("id") //Id elemento
+         console.log( d3.select(this).select(".textarea-node").html())
+         //let textareaValue = d3.select(this).select(".textarea-node").html()//texto del elemento
+         //console.log(textArea)
+         let textArea =document.getElementById(textAreaId) //elemento
+         console.log(textArea)
+        textArea.onblur= function(){
+          textArea.innerHTML = textArea.value 
+          console.log(textArea)
+           d3.select(this).select(".textarea-node").html(textArea.innerHTML)
+          // textareaValue = d3.select(this).select(".textarea-node").value()
+          // d3.select(this).select(".textarea-node").html(textareaValue)
+          // console.log( d3.select(this).select(".textarea-node").html())
+        }
+         
+       }
       // select target node for new node connection
       function node_mouseover(d) {
         console.log("node_mouseover");
@@ -457,7 +468,7 @@ g.node .rect {
   fill: #f6e4a4;
   stroke: #cdbd82;
 }
-g.node .rect:hover{
+g.node .rect:hover {
   stroke-width: 2px;
 }
 .rect:active {
@@ -472,7 +483,7 @@ g.node .rect:hover{
 }
 .nodetext {
   fill: #8c866e;
-  background-color: #FFDCB1;
+  background-color: #ffdcb1;
 }
 .linetext,
 .nodetext {
@@ -507,5 +518,15 @@ g.node.selected rect.rect {
 g.node.selected_target rect.rect {
   fill: #f6f3a2;
   stroke-width: 1.5px;
+}
+.textarea-node {
+  background-color: #ffdcb1;
+  font-size: 9px;
+  width: 68px;
+  height:46px;
+  resize: none;
+  overflow: hidden;
+  padding: 0;
+  border: none;
 }
 </style>
