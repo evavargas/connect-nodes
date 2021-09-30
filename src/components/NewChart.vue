@@ -21,8 +21,8 @@ export default {
     var refShape = ref(props.datashapes);
     var refLink = ref(props.datalinks);
     //width and heigt for rect of nodes
-    const width = 68;
-    const height = 46;
+    const width = 92;
+    const height = 76;
     //size for graph
     var widthGraph = 960;
     var heightGraph = 500;
@@ -110,10 +110,10 @@ export default {
           d3
             .forceLink()
             .id((d) => d.id)
-            .distance(140)
+            .distance(160)
         )
         // add some collision detection so they don't overlap
-        .force("collide", d3.forceCollide().radius(20));
+        .force("collide", d3.forceCollide().radius(10));
 
       //mouse and key events
       d3.select(window)
@@ -143,11 +143,21 @@ export default {
           .on("mousedown", line_mousedown);
         link.exit().remove();
 
-        linkText = allTexts
-          .selectAll("text")
-          .data(refLink.value)
-          .text((d) => d.text);
-        linkText.enter().append("text").attr("class", "linetext");
+        linkText = allTexts.selectAll(".linetextbody").data(refLink.value);
+        var linkTextg = linkText
+          .enter()
+          .append("svg:foreignObject")
+          .attr("class", "linetextbody")
+          .attr("width", 84 + "px")
+          .attr("height", 22 + "px")
+          linkTextg
+          .html(
+            (d) =>
+              `<textarea class="textarea-line" id="linetext${d.id}">${d.text}</textarea>`
+          )
+          .attr("x", 2)
+          .attr("dominant-baseline", "auto")
+          .on("change", updateTextLink);
         linkText.exit().remove();
 
         node = allNodes
@@ -165,8 +175,8 @@ export default {
         nodeg
           .append("svg:rect")
           .attr("class", "rect")
-          .attr("width", width + 16 + "px")
-          .attr("height", height + 16 + "px")
+          .attr("width", width + "px")
+          .attr("height", height + "px")
           .on("mousedown", node_mousedown)
           .on("mouseover", node_mouseover)
           .on("mouseout", node_mouseout);
@@ -174,15 +184,15 @@ export default {
           .append("foreignObject")
           .attr("x", 6)
           .attr("y", 6)
-          .attr("class", "nodetext")
-          .attr("width", width+2)
-          .attr("height", height+2)
-          .html((d)=>`<textarea class="textarea-node" id="node${d.id}">${d.text}</textarea>` )
-          .attr("width", width)
-          .attr("height", height)
-          .attr("text-anchor", "start")
+          .attr("class", "nodebody")
+          .attr("width", width - 12 + "px")
+          .attr("height", height - 12 + "px")
+          .html(
+            (d) =>
+              `<textarea class="textarea-node" id="node${d.id}">${d.text}</textarea>`
+          )
           .attr("dominant-baseline", "auto")
-          .on("change", updateTextNode)
+          .on("change", updateTextNode);
         node.exit().remove();
 
         simulation.nodes(refShape.value).on("tick", ticked);
@@ -191,7 +201,7 @@ export default {
           d3
             .forceLink(refLink.value)
             .id((d) => d.id)
-            .distance(135)
+            .distance(160)
         );
         simulation.restart();
       }
@@ -202,8 +212,11 @@ export default {
 
         //adding text to links
         linkText
-          .attr("x", (d) => (d.source.x + d.target.x) / 2)
-          .attr("y", (d) => (d.source.y + d.target.y) / 2);
+          .attr(
+            "x",
+            (d) => ((d.source.x + width / 2 + (d.target.x + width / 2)) / 2)-15
+          )
+          .attr("y", (d) => ((d.source.y + height + d.target.y) / 2)-20);
         //position of nodes linked
         node.attr("transform", (d) => "translate(" + d.x + "," + d.y + ")");
       }
@@ -245,24 +258,30 @@ export default {
         console.log("adding link");
         refLink.value.push(x);
       }
-       function updateTextNode() {
+      function updateTextNode() {
+        let textAreaId = d3.select(this).select(".textarea-node").attr("id"); //element Id 
+        console.log(d3.select(this).select(".textarea-node").html());
 
-         let textAreaId = d3.select(this).select(".textarea-node").attr("id") //Id elemento
-         console.log( d3.select(this).select(".textarea-node").html())
-         //let textareaValue = d3.select(this).select(".textarea-node").html()//texto del elemento
-         //console.log(textArea)
-         let textArea =document.getElementById(textAreaId) //elemento
-         console.log(textArea)
-        textArea.onblur= function(){
-          textArea.innerHTML = textArea.value 
-          console.log(textArea)
-           d3.select(this).select(".textarea-node").html(textArea.innerHTML)
-          // textareaValue = d3.select(this).select(".textarea-node").value()
-          // d3.select(this).select(".textarea-node").html(textareaValue)
-          // console.log( d3.select(this).select(".textarea-node").html())
-        }
-         
-       }
+        let textArea = document.getElementById(textAreaId); //elemento
+        console.log(textArea);
+        textArea.onblur = function () {
+          textArea.innerHTML = textArea.value;
+          console.log(textArea);
+          d3.select(this).select(".textarea-node").html(textArea.innerHTML);
+        };
+      }
+      function updateTextLink() {
+        let textAreaId = d3.select(this).select(".textarea-line").attr("id"); //element Id
+        console.log(d3.select(this).select(".textarea-line").html());
+
+        let textArea = document.getElementById(textAreaId); //element Id
+        console.log(textArea);
+        textArea.onblur = function () {
+          textArea.innerHTML = textArea.value;
+          console.log(textArea);
+          d3.select(this).select(".textarea-node").html(textArea.innerHTML);
+        };
+      }
       // select target node for new node connection
       function node_mouseover(d) {
         console.log("node_mouseover");
@@ -366,6 +385,7 @@ export default {
           }
           selected_node.fixed = false;
           addLink({
+            id: refLink.value.length,
             source: selected_node,
             target: new_node,
             text: selected_node.id + " to " + new_node.id,
@@ -474,20 +494,15 @@ g.node .rect:hover {
 .rect:active {
   cursor: grabbing;
 }
-.linetext {
-  fill: #d3a16e;
-}
-.linetext:hover,
-.nodetext {
+
+.linetextbody:hover,
+.nodebody {
   cursor: text;
 }
-.nodetext {
-  fill: #8c866e;
+
+.linetextbody,
+.nodebody {
   background-color: #ffdcb1;
-}
-.linetext,
-.nodetext {
-  font-size: 9px;
 }
 .line {
   fill: #ffffff00;
@@ -522,11 +537,28 @@ g.node.selected_target rect.rect {
 .textarea-node {
   background-color: #ffdcb1;
   font-size: 9px;
-  width: 68px;
-  height:46px;
+  width: 80px;
+  height: 64px;
   resize: none;
   overflow: hidden;
   padding: 0;
   border: none;
+  text-anchor: start;
 }
+.textarea-line {
+  background-color: #ffdcb1;
+  font-size: 9px;
+  width: 80px;
+  resize: none;
+  overflow: hidden;
+  padding: 0;
+  border: none;
+  text-anchor: start;
+  margin-top: 1px;
+}
+.linetextbody{
+ background-color:  #f6e4a4;
+
+}
+
 </style>
