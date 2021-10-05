@@ -13,7 +13,7 @@ import { onMounted, ref } from "vue";
 import * as d3 from "d3";
 
 export default {
-  name: "NewChart",
+  name: "Chart",
   props: { datashapes: Array, datalinks: Array },
   setup(props) {
     // create ref to pass to D3 for DOM manipulation
@@ -67,19 +67,16 @@ export default {
         .attr("d", "M 0,0 m -5,-5 L 5,0 L -5,5 Z");
       //drag
       function dragstarted(d) {
-        console.log("dragstarted");
         if (!d3.event.active) {
           simulation.alphaTarget(0.2).restart();
           (d.fx = d.x), (d.fy = d.y);
         }
       }
       function dragged(d) {
-        console.log("dragged");
         d.fx = d3.event.x;
         d.fy = d3.event.y;
       }
       function dragended() {
-        console.log("dragended");
         if (!d3.event.active) simulation.alphaTarget(0);
       }
       //mouse events
@@ -251,40 +248,31 @@ export default {
       }
 
       function addNode(x) {
-        console.log("adding node");
         refShape.value.push(x);
       }
       function addLink(x) {
-        console.log("adding link");
         refLink.value.push(x);
       }
       function updateTextNode() {
         let textAreaId = d3.select(this).select(".textarea-node").attr("id"); //element Id 
-        console.log(d3.select(this).select(".textarea-node").html());
 
         let textArea = document.getElementById(textAreaId); //elemento
-        console.log(textArea);
         textArea.onblur = function () {
           textArea.innerHTML = textArea.value;
-          console.log(textArea);
           d3.select(this).select(".textarea-node").html(textArea.innerHTML);
         };
       }
       function updateTextLink() {
         let textAreaId = d3.select(this).select(".textarea-line").attr("id"); //element Id
-        console.log(d3.select(this).select(".textarea-line").html());
 
         let textArea = document.getElementById(textAreaId); //element Id
-        console.log(textArea);
         textArea.onblur = function () {
           textArea.innerHTML = textArea.value;
-          console.log(textArea);
           d3.select(this).select(".textarea-node").html(textArea.innerHTML);
         };
       }
       // select target node for new node connection
       function node_mouseover(d) {
-        console.log("node_mouseover");
         if (drawing_line && d !== selected_node) {
           // highlight and select target node
           selected_target_node = d;
@@ -292,7 +280,6 @@ export default {
       }
 
       function node_mouseout() {
-        console.log("node_mouseout");
         if (drawing_line) {
           selected_target_node = null;
         }
@@ -300,7 +287,6 @@ export default {
 
       // select node / start drag
       function node_mousedown(d) {
-        console.log("node_mousedown");
         if (!drawing_line) {
           selected_node = d;
           selected_link = null;
@@ -316,7 +302,6 @@ export default {
 
       // select line
       function line_mousedown(d) {
-        console.log("line_mousedown");
         selected_link = d;
         selected_node = null;
         console.log(d);
@@ -325,7 +310,6 @@ export default {
 
       // draw yellow "new connector" line
       function mousemove() {
-        console.log("mousemove");
         if (drawing_line && !should_drag) {
           var m = d3.mouse(svg.node());
           var x = m[0];
@@ -351,7 +335,6 @@ export default {
       // add a new disconnected node
       function mousedown() {
         d3.event.preventDefault();
-        console.log("mousedown");
         var m = d3.mouse(svg.node());
         addNode({
           id: refShape.value.length,
@@ -367,7 +350,6 @@ export default {
 
       // end node select / add new connected node
       function mouseup() {
-        console.log("mouseup");
         drawing_line = false;
         if (new_line) {
           if (selected_target_node) {
@@ -402,18 +384,14 @@ export default {
 
       // select for dragging node with shift; delete node with backspace
       function keydown() {
-        console.log("keydown");
         switch (d3.event.keyCode) {
           case 8: // backspace
           case 46: {
             // delete
             if (selected_node) {
-              console.log(selected_node);
               // deal with nodes
               var i = refShape.value.indexOf(selected_node);
-              console.log(i);
               refShape.value.splice(i, 1);
-              console.log(refShape.value);
               // find links to/from this node, and delete them too
               var new_links = [];
               refLink.value.forEach(function (l) {
@@ -422,24 +400,18 @@ export default {
                 }
               });
               refLink.value = new_links;
-              console.log(refLink.value);
               selected_node = refShape.value.length
                 ? refShape.value[i > 0 ? i - 1 : 0]
                 : null;
             } else if (selected_link) {
-              console.log(selected_link);
               // deal with links
               i = refLink.value.indexOf(selected_link);
-              console.log(i);
               refLink.value.splice(i, 1);
-              console.log(refLink.value);
               selected_link = refLink.value.length
                 ? refLink.value[i > 0 ? i - 1 : 0]
                 : null;
             }
             update();
-            console.log(refShape.value);
-            console.log(refLink.value);
             break;
           }
           case 17: {
@@ -460,10 +432,12 @@ export default {
         }
       }
       function keyup() {
-        console.log("keyup");
         should_drag = false;
         simulation.tick();
       }
+      update()
+      simulation.restart()
+      update()
     });
 
     return { svgRef };
