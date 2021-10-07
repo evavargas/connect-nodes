@@ -145,6 +145,7 @@ export default {
           .enter()
           .append("svg:foreignObject")
           .attr("class", "linetextbody")
+          .attr("value", (d)=> `${d.id}`)
           .attr("width", 84 + "px")
           .attr("height", 22 + "px")
           linkTextg
@@ -166,6 +167,7 @@ export default {
           .enter()
           .append("g")
           .attr("class", "node")
+          .attr("value", (d)=> `${d.id}`)
           .call(drag)
           .attr("transform", (d) => "translate(" + d.x + "," + d.y + ")");
 
@@ -186,7 +188,7 @@ export default {
           .attr("height", height - 12 + "px")
           .html(
             (d) =>
-              `<textarea class="textarea-node" id="node${d.id}">${d.text}</textarea>`
+              `<textarea class="textarea-node" id="nodetext${d.id}">${d.text}</textarea>`
           )
           .attr("dominant-baseline", "auto")
           .on("change", updateTextNode);
@@ -253,23 +255,37 @@ export default {
       function addLink(x) {
         refLink.value.push(x);
       }
+      function editTextNode(textAreaId, textArea){
+        let i = parseInt((document.getElementById(textAreaId).parentNode.parentNode).getAttribute("value"))
+        let element = refShape.value.filter(e => e.id == i)[0] //data from element that was edited
+        element.text = textArea.innerHTML;
+      }
+      function editTextLink(textAreaId, textArea){
+        let i = parseInt((document.getElementById(textAreaId).parentNode).getAttribute("value"))
+        let element = refLink.value.filter(e => e.id == i)[0] //data from element that was edited
+        element.text = textArea.innerHTML;
+      }
       function updateTextNode() {
         let textAreaId = d3.select(this).select(".textarea-node").attr("id"); //element Id 
-
-        let textArea = document.getElementById(textAreaId); //elemento
+        let textArea = document.getElementById(textAreaId); //element
+        textArea.innerHTML = textArea.value;
+        d3.select(this).select(".textarea-node").html(textArea.innerHTML); //end on change
         textArea.onblur = function () {
           textArea.innerHTML = textArea.value;
-          d3.select(this).select(".textarea-node").html(textArea.innerHTML);
+        d3.select(this).select(".textarea-node").html(textArea.innerHTML); //end on blur
         };
+        editTextNode(textAreaId, textArea)
       }
       function updateTextLink() {
         let textAreaId = d3.select(this).select(".textarea-line").attr("id"); //element Id
-
-        let textArea = document.getElementById(textAreaId); //element Id
+        let textArea = document.getElementById(textAreaId); //element
+        textArea.innerHTML = textArea.value; 
+        d3.select(this).select(".textarea-node").html(textArea.innerHTML); //end on change
         textArea.onblur = function () {
           textArea.innerHTML = textArea.value;
-          d3.select(this).select(".textarea-node").html(textArea.innerHTML);
+        d3.select(this).select(".textarea-node").html(textArea.innerHTML); //end on blur
         };
+        editTextLink(textAreaId, textArea)
       }
       // select target node for new node connection
       function node_mouseover(d) {
@@ -289,6 +305,7 @@ export default {
       function node_mousedown(d) {
         if (!drawing_line) {
           selected_node = d;
+          console.log(selected_node)
           selected_link = null;
         }
         if (!should_drag) {
@@ -304,7 +321,7 @@ export default {
       function line_mousedown(d) {
         selected_link = d;
         selected_node = null;
-        console.log(d);
+        console.log(selected_link);
         update();
       }
 

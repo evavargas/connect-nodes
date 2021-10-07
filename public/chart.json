@@ -1,0 +1,143 @@
+{
+    "nodes": [
+        {
+            "id": 0,
+            "x": 405.6179563173915,
+            "y": 93.58813637133392,
+            "text": "Parmesan cottage cheese macaroni cheese. ",
+            "index": 0,
+            "vy": 1.7107258032293455e-13,
+            "vx": 8.292968636586842e-14
+        },
+        {
+            "id": 1,
+            "x": 434.3919063860045,
+            "y": 250.97955861997553,
+            "text": "Cream cheese halloumi manchego cream cheese",
+            "index": 1,
+            "vy": -9.075541502134289e-14,
+            "vx": -1.795316943853856e-14
+        },
+        {
+            "id": 2,
+            "x": 290.9655776066946,
+            "y": 205.18935525347092,
+            "text": "cheese and wine gouda fromage frais cheddar.",
+            "index": 2,
+            "vy": 8.536834575210685e-14,
+            "vx": -8.770230376957178e-14
+        },
+        {
+            "id": 3,
+            "x": 324.1513478613538,
+            "y": 366.94084205618674,
+            "text": "St. agur blue cheese manchego",
+            "index": 3,
+            "vy": -7.726893821149347e-14,
+            "vx": 7.345702372007705e-14
+        },
+        {
+            "id": 4,
+            "x": 559.4714427391546,
+            "y": 350.75485408774784,
+            "text": "bavarian bergkase feta swiss",
+            "index": 4,
+            "vy": -7.797832312245387e-14,
+            "vx": -9.775458436662641e-14
+        }
+    ],
+    "links": [
+        {
+            "id": 0,
+            "source": {
+                "id": 0,
+                "x": 405.6179563173915,
+                "y": 93.58813637133392,
+                "text": "Parmesan cottage cheese macaroni cheese. ",
+                "index": 0,
+                "vy": 1.7107258032293455e-13,
+                "vx": 8.292968636586842e-14
+            },
+            "target": {
+                "id": 1,
+                "x": 434.3919063860045,
+                "y": 250.97955861997553,
+                "text": "Cream cheese halloumi manchego cream cheese",
+                "index": 1,
+                "vy": -9.075541502134289e-14,
+                "vx": -1.795316943853856e-14
+            },
+            "text": "parmesan",
+            "index": 0
+        },
+        {
+            "id": 1,
+            "source": {
+                "id": 0,
+                "x": 405.6179563173915,
+                "y": 93.58813637133392,
+                "text": "Parmesan cottage cheese macaroni cheese. ",
+                "index": 0,
+                "vy": 1.7107258032293455e-13,
+                "vx": 8.292968636586842e-14
+            },
+            "target": {
+                "id": 2,
+                "x": 290.9655776066946,
+                "y": 205.18935525347092,
+                "text": "cheese and wine gouda fromage frais cheddar.",
+                "index": 2,
+                "vy": 8.536834575210685e-14,
+                "vx": -8.770230376957178e-14
+            },
+            "text": "cheese",
+            "index": 1
+        },
+        {
+            "id": 2,
+            "source": {
+                "id": 1,
+                "x": 434.3919063860045,
+                "y": 250.97955861997553,
+                "text": "Cream cheese halloumi manchego cream cheese",
+                "index": 1,
+                "vy": -9.075541502134289e-14,
+                "vx": -1.795316943853856e-14
+            },
+            "target": {
+                "id": 3,
+                "x": 324.1513478613538,
+                "y": 366.94084205618674,
+                "text": "St. agur blue cheese manchego",
+                "index": 3,
+                "vy": -7.726893821149347e-14,
+                "vx": 7.345702372007705e-14
+            },
+            "text": "strings",
+            "index": 2
+        },
+        {
+            "id": 3,
+            "source": {
+                "id": 1,
+                "x": 434.3919063860045,
+                "y": 250.97955861997553,
+                "text": "Cream cheese halloumi manchego cream cheese",
+                "index": 1,
+                "vy": -9.075541502134289e-14,
+                "vx": -1.795316943853856e-14
+            },
+            "target": {
+                "id": 4,
+                "x": 559.4714427391546,
+                "y": 350.75485408774784,
+                "text": "bavarian bergkase feta swiss",
+                "index": 4,
+                "vy": -7.797832312245387e-14,
+                "vx": -9.775458436662641e-14
+            },
+            "text": "parmesan",
+            "index": 3
+        }
+    ]
+}
