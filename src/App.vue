@@ -1,31 +1,27 @@
 <template>
-  <link
-    rel="stylesheet"
-    href="http://code.ionicframework.com/ionicons/2.0.1/css/ionicons.min.css"
-  />
   <div>
     <header>
       <div @click="show = !show">
-        <i class="ion-navicon"></i>
+        <MenuOutline class="ion-icon"/>
       </div>
     </header>
     <aside class="box-app" v-if="show" transition="slide">
       <ul>
         <li>
           <div class="button">
-            <label for="newChart" class="input">New chart</label>
+            <label for="newChart" class="input"><DocumentOutline class="ion-icon"/>New chart</label>
             <input type="button" id="newChart" value="New Chart" @change="newFile" style="display: none"/>
           </div>
         </li>
         <li>
           <div class="button">
-            <label for="files" class="input">Open chart</label>
+            <label for="files" class="input"><FolderOpenOutline class="ion-icon"/>Open chart</label>
             <input type="file" id="files" @change="loadTextFromFile" style="display: none" />
           </div>
         </li>
         <li>
           <div class="button">
-            <label for="download" class="input">Download chart</label>
+            <label for="download" class="input"><DownloadOutline class="ion-icon"/>Download chart</label>
             <input type="button" id="download" value="Download" v-on:click="downloadFile()" style="display: none"/>
           </div>
         </li>
@@ -34,6 +30,7 @@
     <keep-alive>
       <Chart :datashapes="datanodes" :datalinks="datalinks" />
     </keep-alive>
+    
   </div>
 </template>
 
@@ -41,11 +38,18 @@
 import { defineAsyncComponent } from "vue";
 import axios from "axios";
 import { saveAs } from "file-saver";
-
+import MenuOutline from 'vue-ionicons/dist/ios-menu.vue'
+import FolderOpenOutline from 'vue-ionicons/dist/ios-folder-open.vue'
+import DocumentOutline from 'vue-ionicons/dist/ios-document.vue'
+import DownloadOutline from 'vue-ionicons/dist/ios-download.vue'
 export default {
   name: "app",
   components: {
     Chart: defineAsyncComponent(() => import("./components/Chart.vue")),
+    MenuOutline,
+    FolderOpenOutline,
+    DocumentOutline,
+    DownloadOutline
   },
   data: function () {
     return {
@@ -145,8 +149,13 @@ header {
   overflow: hidden;
   box-sizing: border-box;
 }
-.ion-navicon {
+.ion-icon {
   font-size: 24px;
+  display: inline;
+  stroke: rgb(8, 63, 72);
+  fill: rgb(219, 250, 255);
+  stroke-width: 8px;
+  stroke-opacity: 0.9;
 }
 .box-app {
   background-color: #fff;
@@ -161,6 +170,9 @@ header {
   align-items: left;
   box-shadow: 0 3px 6px rgba(0, 0, 0, 0.16), 0 3px 6px rgba(0, 0, 0, 0.23);
 }
+.box-app ul{
+  list-style: none;
+}
 aside h2 {
   font-weight: 300;
   color: #afafaf;
@@ -168,16 +180,24 @@ aside h2 {
 .box-app .button {
   background-color: transparent;
   border: 0;
-  width: 80px;
-  height: 40px;
+  width: 136px;
+  margin: 15px 0px;
+  padding: 0.7rem;
   outline: none;
   cursor: pointer;
-  border-radius: 50%;
+  border-radius: 20%;
   transition: all 0.3s ease-in-out;
+  font-size: 16px;
+  box-sizing: border-box;
 }
-.button input, .button .input{
-  width: 100px;
+.button .input{
+  width: 136px;
+  
 }
+.button .ion-icon {
+  font-size: 14px;
+}
+
 .button:active {
   background-color: rgba(0, 0, 0, 0.1);
 }

@@ -539,7 +539,7 @@ export default {
 .svgRef {
   background-color: #fcf0f0;
 }
-svg:hover {
+.resizeRef:hover {
   cursor: crosshair;
 }
 .node:hover {
@@ -635,9 +635,13 @@ g.node.selected_target rect.rect {
 }
 .box-inner p {
   margin: 0;
+  font-size: 14px;
+  font-family: Helvetica, sans-serif;
 }
 .box-inner button {
   margin: 0.7rem;
   width: 100px;
+  font-size: 12px;
+
 }
 </style>
