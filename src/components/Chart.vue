@@ -1,9 +1,35 @@
 <template>
-  <div style="padding: 2rem">
+  <div style="padding: 2rem; margin-top: 56px">
     <div ref="resizeRef" class="resizeRef">
+      
       <svg ref="svgRef" class="svgRef">
         <g class="graph"></g>
       </svg>
+      <div class="menu-inner box-inner">
+        <p>
+              <ul>
+                <li>
+                  Add a node: right click. (Context menu)  
+                </li>
+                <li>
+                  Link nodes: drag from a node to another to connect nodes.
+                </li>
+                <li>
+                  Additionaly if not target
+              selected, It creates a new node
+                </li>
+              </ul>
+               <ul> Drag and drop:
+                <li>Windows: Ctrl + left click.</li>
+                <li>
+                Mac: ⌘+ left click to move nodes Press Supr /
+              Backspace to delete nodes or lines
+                </li>
+                <li>Also, use the buttons </li>
+              </ul>
+            </p>
+      </div>
+
     </div>
   </div>
 </template>
@@ -11,12 +37,14 @@
 <script>
 import { onMounted, ref } from "vue";
 import * as d3 from "d3";
+import mousedown from "./Chart.vue";
 
 export default {
   name: "Chart",
   props: { datashapes: Array, datalinks: Array },
   setup(props) {
     // create ref to pass to D3 for DOM manipulation
+    const resizeRef = ref(null);
     const svgRef = ref(null);
     var refShape = ref(props.datashapes);
     var refLink = ref(props.datalinks);
@@ -24,7 +52,7 @@ export default {
     const width = 92;
     const height = 76;
     //size for graph
-    var widthGraph = 960;
+    var widthGraph = 1000;
     var heightGraph = 500;
     //elements for new link function
     var selected_node,
@@ -39,6 +67,20 @@ export default {
       svg.attr("height", heightGraph).attr("width", widthGraph);
       //this g is the container of graph
       var g = svg.select(".graph");
+      var gmenu = d3.select(resizeRef.value);
+      var allButtons = gmenu.select(".menu-inner");
+      allButtons
+        .append("button")
+        .html("Add node")
+        .on("mousedown", function () {
+          mousedown();
+        });
+      allButtons
+        .append("button")
+        .html("Delete element")
+        .on("mousedown", function () {
+          deleteNodeorLink();
+        });
       //svg marker for arrow
       var defsarrow = g.append("svg:defs");
       //group of lines
@@ -145,10 +187,10 @@ export default {
           .enter()
           .append("svg:foreignObject")
           .attr("class", "linetextbody")
-          .attr("value", (d)=> `${d.id}`)
+          .attr("value", (d) => `${d.id}`)
           .attr("width", 84 + "px")
-          .attr("height", 22 + "px")
-          linkTextg
+          .attr("height", 22 + "px");
+        linkTextg
           .html(
             (d) =>
               `<textarea class="textarea-line" id="linetext${d.id}">${d.text}</textarea>`
@@ -167,7 +209,7 @@ export default {
           .enter()
           .append("g")
           .attr("class", "node")
-          .attr("value", (d)=> `${d.id}`)
+          .attr("value", (d) => `${d.id}`)
           .call(drag)
           .attr("transform", (d) => "translate(" + d.x + "," + d.y + ")");
 
@@ -213,9 +255,9 @@ export default {
         linkText
           .attr(
             "x",
-            (d) => ((d.source.x + width / 2 + (d.target.x + width / 2)) / 2)-15
+            (d) => (d.source.x + width / 2 + (d.target.x + width / 2)) / 2 - 15
           )
-          .attr("y", (d) => ((d.source.y + height + d.target.y) / 2)-20);
+          .attr("y", (d) => (d.source.y + height + d.target.y) / 2 - 20);
         //position of nodes linked
         node.attr("transform", (d) => "translate(" + d.x + "," + d.y + ")");
       }
@@ -255,37 +297,43 @@ export default {
       function addLink(x) {
         refLink.value.push(x);
       }
-      function editTextNode(textAreaId, textArea){
-        let i = parseInt((document.getElementById(textAreaId).parentNode.parentNode).getAttribute("value"))
-        let element = refShape.value.filter(e => e.id == i)[0] //data from element that was edited
+      function editTextNode(textAreaId, textArea) {
+        let i = parseInt(
+          document
+            .getElementById(textAreaId)
+            .parentNode.parentNode.getAttribute("value")
+        );
+        let element = refShape.value.filter((e) => e.id == i)[0]; //data from element that was edited
         element.text = textArea.innerHTML;
       }
-      function editTextLink(textAreaId, textArea){
-        let i = parseInt((document.getElementById(textAreaId).parentNode).getAttribute("value"))
-        let element = refLink.value.filter(e => e.id == i)[0] //data from element that was edited
+      function editTextLink(textAreaId, textArea) {
+        let i = parseInt(
+          document.getElementById(textAreaId).parentNode.getAttribute("value")
+        );
+        let element = refLink.value.filter((e) => e.id == i)[0]; //data from element that was edited
         element.text = textArea.innerHTML;
       }
       function updateTextNode() {
-        let textAreaId = d3.select(this).select(".textarea-node").attr("id"); //element Id 
+        let textAreaId = d3.select(this).select(".textarea-node").attr("id"); //element Id
         let textArea = document.getElementById(textAreaId); //element
         textArea.innerHTML = textArea.value;
         d3.select(this).select(".textarea-node").html(textArea.innerHTML); //end on change
         textArea.onblur = function () {
           textArea.innerHTML = textArea.value;
-        d3.select(this).select(".textarea-node").html(textArea.innerHTML); //end on blur
+          d3.select(this).select(".textarea-node").html(textArea.innerHTML); //end on blur
         };
-        editTextNode(textAreaId, textArea)
+        editTextNode(textAreaId, textArea);
       }
       function updateTextLink() {
         let textAreaId = d3.select(this).select(".textarea-line").attr("id"); //element Id
         let textArea = document.getElementById(textAreaId); //element
-        textArea.innerHTML = textArea.value; 
+        textArea.innerHTML = textArea.value;
         d3.select(this).select(".textarea-node").html(textArea.innerHTML); //end on change
         textArea.onblur = function () {
           textArea.innerHTML = textArea.value;
-        d3.select(this).select(".textarea-node").html(textArea.innerHTML); //end on blur
+          d3.select(this).select(".textarea-node").html(textArea.innerHTML); //end on blur
         };
-        editTextLink(textAreaId, textArea)
+        editTextLink(textAreaId, textArea);
       }
       // select target node for new node connection
       function node_mouseover(d) {
@@ -305,7 +353,7 @@ export default {
       function node_mousedown(d) {
         if (!drawing_line) {
           selected_node = d;
-          console.log(selected_node)
+          console.log(selected_node);
           selected_link = null;
         }
         if (!should_drag) {
@@ -351,12 +399,12 @@ export default {
 
       // add a new disconnected node
       function mousedown() {
-        d3.event.preventDefault();
-        var m = d3.mouse(svg.node());
+        // d3.event.preventDefault();
+        //var m = d3.mouse(svg.node());
         addNode({
           id: refShape.value.length,
-          x: m[0],
-          y: m[1],
+          x: 10,
+          y: 10,
           text: "Text" + " " + refShape.value.length,
         });
         selected_link = null;
@@ -398,6 +446,31 @@ export default {
           }, 300);
         }
       }
+      function deleteNodeorLink() {
+        if (selected_node) {
+          // deal with nodes
+          var i = refShape.value.indexOf(selected_node);
+          refShape.value.splice(i, 1);
+          // find links to/from this node, and delete them too
+          var new_links = [];
+          refLink.value.forEach(function (l) {
+            if (l.source !== selected_node && l.target !== selected_node) {
+              new_links.push(l);
+            }
+          });
+          refLink.value = new_links;
+          selected_node = refShape.value.length
+            ? refShape.value[i > 0 ? null : null]
+            : null;
+        } else if (selected_link) {
+          // deal with links
+          i = refLink.value.indexOf(selected_link);
+          refLink.value.splice(i, 1);
+          selected_link = refLink.value.length
+            ? refLink.value[i > 0 ? null : null]
+            : null;
+        }
+      }
 
       // select for dragging node with shift; delete node with backspace
       function keydown() {
@@ -418,14 +491,14 @@ export default {
               });
               refLink.value = new_links;
               selected_node = refShape.value.length
-                ? refShape.value[i > 0 ? i - 1 : 0]
+                ? refShape.value[i > 0 ? null : null]
                 : null;
             } else if (selected_link) {
               // deal with links
               i = refLink.value.indexOf(selected_link);
               refLink.value.splice(i, 1);
               selected_link = refLink.value.length
-                ? refLink.value[i > 0 ? i - 1 : 0]
+                ? refLink.value[i > 0 ? null : null]
                 : null;
             }
             update();
@@ -452,12 +525,12 @@ export default {
         should_drag = false;
         simulation.tick();
       }
-      update()
-      simulation.restart()
-      update()
+      update();
+      simulation.restart();
+      update();
     });
 
-    return { svgRef };
+    return { svgRef, mousedown, resizeRef };
   },
 };
 </script>
@@ -547,9 +620,24 @@ g.node.selected_target rect.rect {
   text-anchor: start;
   margin-top: 1px;
 }
-.linetextbody{
- background-color:  #f6e4a4;
-
+.linetextbody {
+  background-color: #f6e4a4;
 }
-
+.box-inner {
+  background-color: #fff;
+  width: 250px;
+  position: absolute;
+  padding: 0px 2rem;
+  display: inline-block;
+  justify-content: left;
+  align-items: left;
+  box-shadow: 0 1px 1px rgba(0, 0, 0, 0.16), 0 1px 1px rgba(0, 0, 0, 0.23);
+}
+.box-inner p {
+  margin: 0;
+}
+.box-inner button {
+  margin: 0.7rem;
+  width: 100px;
+}
 </style>
