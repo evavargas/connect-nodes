@@ -2,54 +2,81 @@
   <div>
     <header>
       <div @click="show = !show">
-        <MenuOutline class="ion-icon"/>
+        <MenuOutline class="ion-icon" />
       </div>
     </header>
     <aside class="box-app" v-if="show" transition="slide">
       <ul>
         <li>
           <div class="button">
-            <label for="newChart" class="input"><DocumentOutline class="ion-icon"/>New chart</label>
-            <input type="button" id="newChart" value="New Chart" @change="newFile" style="display: none"/>
+            <label for="newChart" class="input"
+              ><DocumentOutline class="ion-icon" />New chart</label
+            >
+            <input
+              type="button"
+              id="newChart"
+              value="New Chart"
+              v-on:click="newFile()"
+              style="display: none"
+            />
           </div>
         </li>
         <li>
           <div class="button">
-            <label for="files" class="input"><FolderOpenOutline class="ion-icon"/>Open chart</label>
-            <input type="file" id="files" @change="loadTextFromFile" style="display: none" />
+            <label for="files" class="input"
+              ><FolderOpenOutline class="ion-icon" />Open chart</label
+            >
+            <input
+              type="file"
+              id="files"
+              @change="openFile"
+              style="display: none"
+            />
           </div>
         </li>
         <li>
           <div class="button">
-            <label for="download" class="input"><DownloadOutline class="ion-icon"/>Download chart</label>
-            <input type="button" id="download" value="Download" v-on:click="downloadFile()" style="display: none"/>
+            <label for="download" class="input"
+              ><DownloadOutline class="ion-icon" />Download chart</label
+            >
+            <input
+              type="button"
+              id="download"
+              value="Download"
+              v-on:click="downloadFile()"
+              style="display: none"
+            />
           </div>
         </li>
       </ul>
     </aside>
     <keep-alive>
-      <Chart :datashapes="datanodes" :datalinks="datalinks" />
+      <Chart
+        :datashapes="datanodes"
+        :datalinks="datalinks"
+        :key="componentKey"
+      />
     </keep-alive>
-    
   </div>
 </template>
 
 <script>
-import { defineAsyncComponent } from "vue";
-import axios from "axios";
+//import { defineAsyncComponent } from "vue";
+//import axios from "axios";
 import { saveAs } from "file-saver";
-import MenuOutline from 'vue-ionicons/dist/ios-menu.vue'
-import FolderOpenOutline from 'vue-ionicons/dist/ios-folder-open.vue'
-import DocumentOutline from 'vue-ionicons/dist/ios-document.vue'
-import DownloadOutline from 'vue-ionicons/dist/ios-download.vue'
+import MenuOutline from "vue-ionicons/dist/ios-menu.vue";
+import FolderOpenOutline from "vue-ionicons/dist/ios-folder-open.vue";
+import DocumentOutline from "vue-ionicons/dist/ios-document.vue";
+import DownloadOutline from "vue-ionicons/dist/ios-download.vue";
+import Chart from "./components/Chart.vue";
 export default {
   name: "app",
   components: {
-    Chart: defineAsyncComponent(() => import("./components/Chart.vue")),
+    Chart, //: defineAsyncComponent(() => import("./components/Chart.vue")),
     MenuOutline,
     FolderOpenOutline,
     DocumentOutline,
-    DownloadOutline
+    DownloadOutline,
   },
   data: function () {
     return {
@@ -58,16 +85,12 @@ export default {
       datalinks: [],
       json: "",
       data: {},
-      // nodes: [{ id: 0, x: 0, y: 0, text: "" }],
-      // links: [{ id: 0, source: 0, target: 0, text: "" }],
+      componentKey: 0,
     };
-  },
-  created() {
-    this.getShapes("./chartExample.json");
   },
 
   methods: {
-    loadTextFromFile(ev) {
+    openFile(ev) {
       const file = ev.target.files[0];
       const reader = new FileReader();
 
@@ -78,58 +101,38 @@ export default {
           this.updateChart(this.json);
         }
       };
-
       reader.readAsText(file);
     },
     updateChart(data) {
-      this.datanodes = data.nodes;
-      this.datalinks = data.links;
-      console.log(this.datanodes);
-      console.log(this.datalinks);
+      this.componentKey += 1;
+      let incomingNodes = data.nodes;
+      let incomingLinks = data.links;
+
+      incomingLinks.forEach((n) => {
+        n.source = n.source.id;
+        n.target = n.target.id;
+        n.index = null;
+      });
+      this.datanodes = incomingNodes;
+      this.datalinks = incomingLinks;
     },
     newFile() {
+      this.componentKey += 1;
       this.datalinks = [];
       this.datanodes = [];
+      this.data = [];
     },
 
-    // uploadFile() {
-    //   this.newFile = this.$refs.file.files[0];
-    // },
-    // submitFile() {
-    //   const fr = new FileReader();
-    //   fr.addEventListener("load", e => {
-    //     console.log(e.target.result, JSON.parse(fr.result))
-    //   })
-    //fr.readAsText(this.newFile)
-    //this.getShapes(ruta);
-    //},
-    async getShapes(ruta) {
-      let response = await axios.get(ruta);
-      this.datanodes = response.data.nodes;
-      this.datalinks = response.data.links;
-    },
-    openFile() {},
     downloadFile() {
-      console.log(this.$root.$data.datanodes);
       let listNodes = this.$root.$data.datanodes;
       let listLinks = this.$root.$data.datalinks;
-      this.data.nodes = listNodes;
-      this.data.links = listLinks;
-      console.log(this.data);
-      var file = new Blob([JSON.stringify(this.data)], {
+      let data = {};
+      data.nodes = listNodes;
+      data.links = listLinks;
+      var file = new Blob([JSON.stringify(data)], {
         type: "application/json",
       });
       saveAs(file, "chart.json");
-      //var dataString = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(this.data));
-
-      // async getInfo() {
-      //   let response = await axios.get("./Info.json");
-      //   this.nodes = response.data;
-      // },
-
-      // addNode() {
-      //   this.datashapes = [...this.datashapes, this.newNode];
-      // },
     },
   },
 };
@@ -170,7 +173,7 @@ header {
   align-items: left;
   box-shadow: 0 3px 6px rgba(0, 0, 0, 0.16), 0 3px 6px rgba(0, 0, 0, 0.23);
 }
-.box-app ul{
+.box-app ul {
   list-style: none;
 }
 aside h2 {
@@ -190,9 +193,11 @@ aside h2 {
   font-size: 16px;
   box-sizing: border-box;
 }
-.button .input{
+.button .input {
   width: 136px;
-  
+}
+.input:hover {
+  text-shadow: 1px 1px rgb(219, 250, 255);
 }
 .button .ion-icon {
   font-size: 14px;

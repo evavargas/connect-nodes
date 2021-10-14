@@ -73,7 +73,7 @@ export default {
         .append("button")
         .html("Add node")
         .on("mousedown", function () {
-          mousedown();
+          addingNode();
         });
       allButtons
         .append("button")
@@ -353,7 +353,6 @@ export default {
       function node_mousedown(d) {
         if (!drawing_line) {
           selected_node = d;
-          console.log(selected_node);
           selected_link = null;
         }
         if (!should_drag) {
@@ -369,7 +368,6 @@ export default {
       function line_mousedown(d) {
         selected_link = d;
         selected_node = null;
-        console.log(selected_link);
         update();
       }
 
@@ -398,13 +396,27 @@ export default {
       }
 
       // add a new disconnected node
-      function mousedown() {
+      function addingNode() {
         // d3.event.preventDefault();
         //var m = d3.mouse(svg.node());
         addNode({
           id: refShape.value.length,
           x: 10,
           y: 10,
+          text: "Text" + " " + refShape.value.length,
+        });
+        selected_link = null;
+        simulation.stop();
+        update();
+        simulation.tick();
+      }
+      function mousedown() {
+        d3.event.preventDefault();
+        var m = d3.mouse(svg.node());
+        addNode({
+          id: refShape.value.length,
+          x: m[0],
+          y: m[1],
           text: "Text" + " " + refShape.value.length,
         });
         selected_link = null;
@@ -642,6 +654,5 @@ g.node.selected_target rect.rect {
   margin: 0.7rem;
   width: 100px;
   font-size: 12px;
-
 }
 </style>
