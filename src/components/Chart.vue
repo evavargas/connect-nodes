@@ -71,16 +71,23 @@ export default {
       var allButtons = gmenu.select(".menu-inner");
       allButtons
         .append("button")
+        .attr("class", "btn-inner")
         .html("Add node")
         .on("mousedown", function () {
           addingNode();
         });
       allButtons
         .append("button")
+        .attr("class", "btn-inner")
         .html("Delete element")
         .on("mousedown", function () {
           deleteNodeorLink();
         });
+        //prevent re-render
+      var buttons = document.getElementsByClassName("btn-inner");
+      if (buttons){
+        buttons.length > 2 ? ()=>{buttons[0].remove; buttons[1].remove(); console.log("exito")} : null;
+      }
       //svg marker for arrow
       var defsarrow = g.append("svg:defs");
       //group of lines
