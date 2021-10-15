@@ -36,16 +36,15 @@
         </li>
         <li>
           <div class="button">
-            <label for="download" class="input"
-              ><DownloadOutline class="ion-icon" />Download chart</label
+            <DownloadOutline class="ion-icon" />
+            <a
+              class="input"
+              id="downloadFile"
+              :href="urlFile"
+              download="My_chart"
+              v-on:click="downloadChart()"
+              >Download Chart</a
             >
-            <input
-              type="button"
-              id="download"
-              value="Download"
-              v-on:click="downloadFile()"
-              style="display: none"
-            />
           </div>
         </li>
       </ul>
@@ -62,13 +61,12 @@
 
 <script>
 //import { defineAsyncComponent } from "vue";
-//import axios from "axios";
-import { saveAs } from "file-saver";
 import MenuOutline from "vue-ionicons/dist/ios-menu.vue";
 import FolderOpenOutline from "vue-ionicons/dist/ios-folder-open.vue";
 import DocumentOutline from "vue-ionicons/dist/ios-document.vue";
 import DownloadOutline from "vue-ionicons/dist/ios-download.vue";
 import Chart from "./components/Chart.vue";
+
 export default {
   name: "app",
   components: {
@@ -85,6 +83,7 @@ export default {
       datalinks: [],
       json: "",
       data: {},
+      urlFile: "",
       componentKey: 0,
     };
   },
@@ -136,7 +135,7 @@ export default {
       this.data = [];
     },
 
-    downloadFile() {
+    downloadChart() {
       let listNodes = this.$root.$data.datanodes;
       let listLinks = this.$root.$data.datalinks;
       let data = {};
@@ -145,7 +144,8 @@ export default {
       var file = new Blob([JSON.stringify(data)], {
         type: "application/json",
       });
-      saveAs(file, "My_chart.json");
+      let url = window.URL.createObjectURL(file);
+      this.urlFile = url;
     },
   },
 };
@@ -196,7 +196,7 @@ aside h2 {
 .box-app .button {
   background-color: transparent;
   border: 0;
-  width: 136px;
+  width: 140px;
   margin: 2px 0px;
   padding: 0.7rem;
   outline: none;
@@ -208,8 +208,10 @@ aside h2 {
   position: relative;
 }
 .button .input {
-  width: 136px;
-  padding: 1rem 0;;
+  width: 140px;
+  padding: 1rem 0;
+  text-decoration: none;
+  color: black;
 }
 .input:hover {
   text-shadow: 1px 1px rgb(219, 250, 255);

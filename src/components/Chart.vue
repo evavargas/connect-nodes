@@ -1,37 +1,27 @@
 <template>
   <div style="padding: 2rem; margin-top: 56px">
     <div ref="resizeRef" class="resizeRef">
-      
-      <svg ref="svgRef" class="svgRef">   
-      </svg>
+      <svg ref="svgRef" class="svgRef"></svg>
       <div class="menu-inner box-inner">
-        <p>
-              <ul>
-                <li>
-                  Add a node: right click. (Context menu)  
-                </li>
-                <li>
-                  Link nodes: drag from a side-node to another to connect nodes.
-                </li>
-                <li>
-                  Additionaly if not target
-              selected, It creates a new node
-                </li>
-              </ul>
-               <ul> Drag and drop
-                <li>Windows: Ctrl + left click.</li>
-                <li>
-                Mac: ⌘+ left click. 
-                </li>
-               </ul>
-               <ul>
-                <li>Remove nodes: Press Supr /
-              Backspace to delete nodes or lines</li>
-                <li>Also, use the buttons </li>
-              </ul>
-            </p>
+        <ul>
+          <li>Add a node: right click. (Context menu)</li>
+          <li>
+            Link nodes: drag from a side-node to another to connect nodes.
+          </li>
+          <li>Additionaly if not target is selected, It creates a new node</li>
+        </ul>
+        <ul>
+          Drag and drop
+          <li>Windows: Ctrl + left click.</li>
+          <li>Mac: ⌘+ left click.</li>
+        </ul>
+        <ul>
+          <li>Remove nodes: Press Supr / Backspace to delete nodes or lines</li>
+        </ul>
+        <ul>
+          Also, use the buttons
+        </ul>
       </div>
-
     </div>
   </div>
 </template>
@@ -173,11 +163,14 @@ export default {
         .on("keyup", keyup);
 
       //context menu to add node
-      contGraph.on("contextmenu", mousedown);
-      // .on("click", ()=>{
-      //   selected_node= null;
-      //   selected_link= null;
-      // })
+      contGraph.on("contextmenu", mousedown).on("click", () => {
+        d3.event.preventDefault();
+        selected_node = null;
+        selected_link = null;
+        simulation.stop();
+        update();
+        simulation.tick();
+      });
 
       function update() {
         link = allLinks
@@ -229,8 +222,8 @@ export default {
           .attr("class", "rect")
           .attr("width", width + "px")
           .attr("height", height + "px")
-          .attr("rx","5")
-          .attr("ry","5")
+          .attr("rx", "5")
+          .attr("ry", "5")
           .on("mousedown", node_mousedown)
           .on("mouseover", node_mouseover)
           .on("mouseout", node_mouseout);
@@ -468,7 +461,7 @@ export default {
             new_line.remove();
             new_line = null;
             simulation.tick();
-          }, 300);
+          }, 220);
         }
       }
       function deleteNodeorLink() {
@@ -487,6 +480,9 @@ export default {
           selected_node = refShape.value.length
             ? refShape.value[i > 0 ? null : null]
             : null;
+          simulation.stop();
+          update();
+          simulation.tick();
         } else if (selected_link) {
           // deal with links
           i = refLink.value.indexOf(selected_link);
@@ -494,6 +490,9 @@ export default {
           selected_link = refLink.value.length
             ? refLink.value[i > 0 ? null : null]
             : null;
+          simulation.stop();
+          update();
+          simulation.tick();
         }
       }
 
@@ -577,7 +576,7 @@ export default {
   cursor: move;
 }
 g.node .rect {
-  fill: #FED17E;
+  fill: #fed17e;
   stroke: #f3c371;
 }
 g.node .rect:hover {
@@ -594,7 +593,7 @@ g.node .rect:hover {
 
 .linetextbody,
 .nodebody {
-  background-color: #FBD594;
+  background-color: #fbd594;
 }
 .line {
   fill: #ffffff00;
@@ -627,7 +626,7 @@ g.node.selected_target rect.rect {
   stroke-width: 1.5px;
 }
 .textarea-node {
-  background-color: #FBD594;
+  background-color: #fbd594;
   font-size: 9px;
   width: 80px;
   height: 64px;
@@ -638,7 +637,7 @@ g.node.selected_target rect.rect {
   text-anchor: start;
 }
 .textarea-line {
-  background-color: #FBD594;
+  background-color: #fbd594;
   font-size: 9px;
   width: 80px;
   resize: none;
@@ -649,7 +648,7 @@ g.node.selected_target rect.rect {
   margin-top: 1px;
 }
 .linetextbody {
-  background-color: #FED17E;
+  background-color: #fed17e;
   border-radius: 4px;
 }
 .box-inner {
@@ -663,7 +662,7 @@ g.node.selected_target rect.rect {
   box-shadow: 0 1px 1px rgba(0, 0, 0, 0.16), 0 1px 1px rgba(0, 0, 0, 0.23);
   margin-left: 0.7rem;
 }
-.box-inner p {
+.box-inner {
   margin: 0;
   font-size: 14px;
   font-family: Helvetica, sans-serif;
