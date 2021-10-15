@@ -90,6 +90,9 @@ export default {
   beforeUpdate() {
     this.verifyrenderOk();
   },
+  mounted(){
+    this.verifyrenderOk();
+  },
   beforeMount() {
     this.verifyrenderOk();
   },
