@@ -2,8 +2,7 @@
   <div style="padding: 2rem; margin-top: 56px">
     <div ref="resizeRef" class="resizeRef">
       
-      <svg ref="svgRef" class="svgRef">
-        <g class="graph"></g>
+      <svg ref="svgRef" class="svgRef">   
       </svg>
       <div class="menu-inner box-inner">
         <p>
@@ -12,19 +11,22 @@
                   Add a node: right click. (Context menu)  
                 </li>
                 <li>
-                  Link nodes: drag from a node to another to connect nodes.
+                  Link nodes: drag from a side-node to another to connect nodes.
                 </li>
                 <li>
                   Additionaly if not target
               selected, It creates a new node
                 </li>
               </ul>
-               <ul> Drag and drop:
+               <ul> Drag and drop
                 <li>Windows: Ctrl + left click.</li>
                 <li>
-                Mac: ⌘+ left click to move nodes Press Supr /
-              Backspace to delete nodes or lines
+                Mac: ⌘+ left click. 
                 </li>
+               </ul>
+               <ul>
+                <li>Remove nodes: Press Supr /
+              Backspace to delete nodes or lines</li>
                 <li>Also, use the buttons </li>
               </ul>
             </p>
@@ -65,8 +67,14 @@ export default {
       // pass ref with DOM element to D3, when mounted (DOM available)
       const svg = d3.select(svgRef.value);
       svg.attr("height", heightGraph).attr("width", widthGraph);
+      var contGraph = svg.append("rect");
+      contGraph
+        .attr("height", heightGraph)
+        .attr("width", widthGraph)
+        .attr("class", "container-graph");
+
       //this g is the container of graph
-      var g = svg.select(".graph");
+      var g = svg.append("g").attr("class", "graph");
       var gmenu = d3.select(resizeRef.value);
       var allButtons = gmenu.select(".menu-inner");
       allButtons
@@ -83,11 +91,7 @@ export default {
         .on("mousedown", function () {
           deleteNodeorLink();
         });
-        //prevent re-render
-      var buttons = document.getElementsByClassName("btn-inner");
-      if (buttons){
-        buttons.length > 2 ? ()=>{buttons[0].remove; buttons[1].remove(); console.log("exito")} : null;
-      }
+
       //svg marker for arrow
       var defsarrow = g.append("svg:defs");
       //group of lines
@@ -136,15 +140,15 @@ export default {
         .on("drag", dragged)
         .on("end", dragended);
       //zoom on area graph
-      svg.call(
+      contGraph.call(
         d3
           .zoom()
+          .on("zoom", zoomed)
           .extent([
             [0, 0],
             [widthGraph, heightGraph],
           ])
           .scaleExtent([1, 10])
-          .on("zoom", zoomed)
       );
       function zoomed() {
         g.attr("transform", d3.event.transform);
@@ -169,7 +173,7 @@ export default {
         .on("keyup", keyup);
 
       //context menu to add node
-      svg.on("contextmenu", mousedown);
+      contGraph.on("contextmenu", mousedown);
       // .on("click", ()=>{
       //   selected_node= null;
       //   selected_link= null;
@@ -381,7 +385,7 @@ export default {
       // draw yellow "new connector" line
       function mousemove() {
         if (drawing_line && !should_drag) {
-          var m = d3.mouse(svg.node());
+          var m = d3.mouse(g.node());
           var x = m[0];
           var y = m[1];
           // debounce - only start drawing line if it gets a bit big
@@ -419,7 +423,7 @@ export default {
       }
       function mousedown() {
         d3.event.preventDefault();
-        var m = d3.mouse(svg.node());
+        var m = d3.mouse(g.node());
         addNode({
           id: refShape.value.length,
           x: m[0],
@@ -440,7 +444,7 @@ export default {
             selected_target_node.fixed = false;
             var new_node = selected_target_node;
           } else {
-            var m = d3.mouse(svg.node());
+            var m = d3.mouse(g.node());
             new_node = {
               id: refShape.value.length,
               x: m[0],
@@ -556,9 +560,12 @@ export default {
 
 <style>
 .svgRef {
-  background-color: #fcf0f0;
+  box-shadow: 5px 10px #888888;
 }
-.resizeRef:hover {
+.container-graph {
+  fill: #fcf0f064;
+}
+.container-graph:hover {
   cursor: crosshair;
 }
 .node:hover {
@@ -651,6 +658,7 @@ g.node.selected_target rect.rect {
   justify-content: left;
   align-items: left;
   box-shadow: 0 1px 1px rgba(0, 0, 0, 0.16), 0 1px 1px rgba(0, 0, 0, 0.23);
+  margin-left: 0.7rem;
 }
 .box-inner p {
   margin: 0;

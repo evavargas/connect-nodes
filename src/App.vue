@@ -88,8 +88,21 @@ export default {
       componentKey: 0,
     };
   },
-
+  beforeUpdate() {
+    this.verifyrenderOk();
+  },
+  beforeMount() {
+    this.verifyrenderOk();
+  },
   methods: {
+    verifyrenderOk() {
+      //prevent re-render
+      var buttons = document.getElementsByClassName("btn-inner");
+      if (buttons.length > 2) {
+        buttons[0].remove();
+        buttons[1].remove();
+      }
+    },
     openFile(ev) {
       const file = ev.target.files[0];
       const reader = new FileReader();
