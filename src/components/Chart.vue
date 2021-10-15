@@ -51,8 +51,8 @@ export default {
     var refShape = ref(props.datashapes);
     var refLink = ref(props.datalinks);
     //width and heigt for rect of nodes
-    const width = 92;
-    const height = 76;
+    const width = 96;
+    const height = 78;
     //size for graph
     var widthGraph = 1000;
     var heightGraph = 500;
@@ -199,14 +199,14 @@ export default {
           .append("svg:foreignObject")
           .attr("class", "linetextbody")
           .attr("value", (d) => `${d.id}`)
-          .attr("width", 84 + "px")
-          .attr("height", 22 + "px");
+          .attr("width", 82 + "px")
+          .attr("height", 21 + "px");
         linkTextg
           .html(
             (d) =>
               `<textarea class="textarea-line" id="linetext${d.id}">${d.text}</textarea>`
           )
-          .attr("x", 2)
+          .attr("x", 3)
           .attr("dominant-baseline", "auto")
           .on("change", updateTextLink);
         linkText.exit().remove();
@@ -229,16 +229,18 @@ export default {
           .attr("class", "rect")
           .attr("width", width + "px")
           .attr("height", height + "px")
+          .attr("rx","5")
+          .attr("ry","5")
           .on("mousedown", node_mousedown)
           .on("mouseover", node_mouseover)
           .on("mouseout", node_mouseout);
         nodeg
           .append("foreignObject")
-          .attr("x", 6)
-          .attr("y", 6)
+          .attr("x", 7)
+          .attr("y", 7)
           .attr("class", "nodebody")
-          .attr("width", width - 12 + "px")
-          .attr("height", height - 12 + "px")
+          .attr("width", width - 16 + "px")
+          .attr("height", height - 13 + "px")
           .html(
             (d) =>
               `<textarea class="textarea-node" id="nodetext${d.id}">${d.text}</textarea>`
@@ -575,11 +577,11 @@ export default {
   cursor: move;
 }
 g.node .rect {
-  fill: #f6e4a4;
-  stroke: #cdbd82;
+  fill: #FED17E;
+  stroke: #f3c371;
 }
 g.node .rect:hover {
-  stroke-width: 2px;
+  stroke-width: 3px;
 }
 .rect:active {
   cursor: grabbing;
@@ -592,7 +594,7 @@ g.node .rect:hover {
 
 .linetextbody,
 .nodebody {
-  background-color: #ffdcb1;
+  background-color: #FBD594;
 }
 .line {
   fill: #ffffff00;
@@ -617,7 +619,7 @@ path.line.selected {
   stroke-opacity: 1;
 }
 g.node.selected rect.rect {
-  fill: #f9b411;
+  fill: #f3c371;
   stroke-width: 1.5px;
 }
 g.node.selected_target rect.rect {
@@ -625,7 +627,7 @@ g.node.selected_target rect.rect {
   stroke-width: 1.5px;
 }
 .textarea-node {
-  background-color: #ffdcb1;
+  background-color: #FBD594;
   font-size: 9px;
   width: 80px;
   height: 64px;
@@ -636,7 +638,7 @@ g.node.selected_target rect.rect {
   text-anchor: start;
 }
 .textarea-line {
-  background-color: #ffdcb1;
+  background-color: #FBD594;
   font-size: 9px;
   width: 80px;
   resize: none;
@@ -647,7 +649,8 @@ g.node.selected_target rect.rect {
   margin-top: 1px;
 }
 .linetextbody {
-  background-color: #f6e4a4;
+  background-color: #FED17E;
+  border-radius: 4px;
 }
 .box-inner {
   background-color: #fff;

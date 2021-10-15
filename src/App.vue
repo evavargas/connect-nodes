@@ -145,7 +145,7 @@ export default {
       var file = new Blob([JSON.stringify(data)], {
         type: "application/json",
       });
-      saveAs(file, "chart.json");
+      saveAs(file, "My_chart.json");
     },
   },
 };
@@ -168,8 +168,8 @@ header {
 .ion-icon {
   font-size: 24px;
   display: inline;
-  stroke: rgb(8, 63, 72);
-  fill: rgb(219, 250, 255);
+  stroke: rgb(78, 102, 238);
+  fill: rgb(37, 66, 232);
   stroke-width: 8px;
   stroke-opacity: 0.9;
 }
@@ -197,7 +197,7 @@ aside h2 {
   background-color: transparent;
   border: 0;
   width: 136px;
-  margin: 15px 0px;
+  margin: 2px 0px;
   padding: 0.7rem;
   outline: none;
   cursor: pointer;
@@ -205,9 +205,11 @@ aside h2 {
   transition: all 0.3s ease-in-out;
   font-size: 16px;
   box-sizing: border-box;
+  position: relative;
 }
 .button .input {
   width: 136px;
+  padding: 1rem 0;;
 }
 .input:hover {
   text-shadow: 1px 1px rgb(219, 250, 255);
