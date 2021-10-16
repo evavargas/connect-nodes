@@ -21,6 +21,10 @@
         <ul>
           Also, use the buttons
         </ul>
+         <div>
+           <button class="inner-btn addnode">Add node</button>
+           <button class="inner-btn delelem">Delete element</button>
+         </div>
       </div>
     </div>
   </div>
@@ -66,21 +70,15 @@ export default {
       //this g is the container of graph
       var g = svg.append("g").attr("class", "graph");
       var gmenu = d3.select(resizeRef.value);
-      var allButtons = gmenu.select(".menu-inner");
-      allButtons
-        .append("button")
-        .attr("class", "btn-inner")
-        .html("Add node")
-        .on("mousedown", function () {
-          addingNode();
-        });
-      allButtons
-        .append("button")
-        .attr("class", "btn-inner")
-        .html("Delete element")
-        .on("mousedown", function () {
-          deleteNodeorLink();
-        });
+      var btnAddNode = gmenu.select(".addnode");
+      btnAddNode.on("mousedown", function(){
+        addingNode();
+      })
+      var btnDelElem = gmenu.select(".delelem");
+      btnDelElem.on("mousedown", function(){
+        deleteNodeorLink();
+      })
+      
 
       //svg marker for arrow
       var defsarrow = g.append("svg:defs");
