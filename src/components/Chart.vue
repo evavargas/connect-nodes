@@ -21,10 +21,10 @@
         <ul>
           Also, use the buttons
         </ul>
-         <div>
-           <button class="inner-btn addnode">Add node</button>
-           <button class="inner-btn delelem">Delete element</button>
-         </div>
+        <div>
+          <button class="inner-btn addnode">Add node</button>
+          <button class="inner-btn delelem">Delete element</button>
+        </div>
       </div>
     </div>
   </div>
@@ -71,14 +71,13 @@ export default {
       var g = svg.append("g").attr("class", "graph");
       var gmenu = d3.select(resizeRef.value);
       var btnAddNode = gmenu.select(".addnode");
-      btnAddNode.on("mousedown", function(){
+      btnAddNode.on("mousedown", function () {
         addingNode();
-      })
+      });
       var btnDelElem = gmenu.select(".delelem");
-      btnDelElem.on("mousedown", function(){
+      btnDelElem.on("mousedown", function () {
         deleteNodeorLink();
-      })
-      
+      });
 
       //svg marker for arrow
       var defsarrow = g.append("svg:defs");
