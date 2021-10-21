@@ -112,6 +112,10 @@ export default {
         n.target = n.target.id;
         n.index = null;
       });
+      this.componentKey += 1;
+      this.datalinks = [];
+      this.datanodes = [];
+      this.data = [];
       this.datanodes = incomingNodes;
       this.datalinks = incomingLinks;
     },
