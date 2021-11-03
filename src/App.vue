@@ -29,6 +29,7 @@
             <input
               type="file"
               id="files"
+              accept=".json"
               @change="openFile"
               style="display: none"
             />
@@ -49,13 +50,15 @@
         </li>
       </ul>
     </aside>
-    <keep-alive>
+    <div class="body-chart">
+      <keep-alive>
       <Chart
         :datashapes="datanodes"
         :datalinks="datalinks"
         :key="componentKey"
       />
     </keep-alive>
+    </div>
   </div>
 </template>
 
@@ -92,7 +95,11 @@ export default {
     openFile(ev) {
       const file = ev.target.files[0];
       const reader = new FileReader();
-
+      if (file) {
+        reader.addEventListener('error', () => {
+          alert(`Error occurred reading file: ${file.name}`)
+        })
+      }
       reader.onload = (e) => {
         {
           this.$emit("load", e.target.result);
@@ -110,7 +117,7 @@ export default {
       incomingLinks.forEach((n) => {
         n.source = n.source.id;
         n.target = n.target.id;
-        n.index = null;
+        //n.index = null;
       });
       this.componentKey += 1;
       this.datalinks = [];
@@ -221,4 +228,17 @@ aside h2 {
 .slide-leave {
   left: -100%;
 }
+@media only screen and (min-width: 1500px){
+  .body-chart{
+  display: flex;
+  justify-content: center;
+}
+}
+@media only screen and (min-width: 1280px) and (max-width: 1350px) {
+  .body-chart{
+  display: flex;
+  justify-content: left;
+}
+}
+
 </style>

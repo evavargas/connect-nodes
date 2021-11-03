@@ -6,7 +6,7 @@
         <ul>
           <li>Add a node: right click. (Context menu)</li>
           <li>
-            Link nodes: drag from a side-node to another to connect nodes.
+            Link nodes: drag from a node to another to connect nodes.
           </li>
           <li>Additionaly if not target is selected, It creates a new node</li>
         </ul>
@@ -14,6 +14,10 @@
           Drag and drop
           <li>Windows: Ctrl + left click.</li>
           <li>Mac: ⌘+ left click.</li>
+        </ul>
+        <ul>
+          Zoom
+          <li>Scrool with mouse</li>
         </ul>
         <ul>
           <li>Remove nodes: Press Supr / Backspace to delete nodes or lines</li>
@@ -33,7 +37,6 @@
 <script>
 import { onMounted, ref } from "vue";
 import * as d3 from "d3";
-import mousedown from "./Chart.vue";
 
 export default {
   name: "Chart",
@@ -48,7 +51,7 @@ export default {
     const width = 96;
     const height = 78;
     //size for graph
-    var widthGraph = 1000;
+    var widthGraph = 960;
     var heightGraph = 500;
     //elements for new link function
     var selected_node,
@@ -81,13 +84,12 @@ export default {
 
       //svg marker for arrow
       var defsarrow = g.append("svg:defs");
-      //group of lines
-      var allLinks = g.append("g").attr("class", "allLinkGroup");
-      //group of nodes
-      var allNodes = g.append("g").attr("class", "allNodeGroup");
       //group of text of lines
       var allTexts = g.append("g").attr("class", "allTextGroup");
-      var link, node, linkText;
+      //group of nodes
+      var allNodes = g.append("g").attr("class", "allNodeGroup");
+
+      var node, linkText;
       //to arrow
       defsarrow
         .selectAll("marker")
@@ -117,7 +119,7 @@ export default {
         d.fy = d3.event.y;
       }
       function dragended() {
-        if (!d3.event.active) simulation.alphaTarget(0);
+        if (!d3.event.active) simulation.alphaTarget(0.2);
       }
       //mouse events
       const drag = d3
@@ -140,17 +142,18 @@ export default {
       function zoomed() {
         g.attr("transform", d3.event.transform);
       }
-      var simulation = d3
-        .forceSimulation()
-        .force(
-          "link",
-          d3
-            .forceLink()
-            .id((d) => d.id)
-            .distance(160)
-        )
-        // add some collision detection so they don't overlap
-        .force("collide", d3.forceCollide().radius(10));
+      var simulation = d3.forceSimulation();
+      simulation.force("collide", d3.forceCollide().radius(10));
+      simulation.nodes(refShape.value).on("tick", ticked);
+      simulation.force(
+        "link",
+        d3
+          .forceLink(refLink.value)
+          .id((d) => d.id)
+          .distance(160)
+      );
+      simulation.tick();
+      // add some collision detection so they don't overlap
 
       //mouse and key events
       d3.select(window)
@@ -164,48 +167,20 @@ export default {
         d3.event.preventDefault();
         selected_node = null;
         selected_link = null;
-        simulation.stop();
         update();
         simulation.tick();
       });
 
       function update() {
-        link = allLinks
-          .selectAll(".line")
-          .data(refLink.value)
-          .attr("d", positionLink)
-          .classed("selected", (d) => d === selected_link);
-        link
-          .enter()
-          .append("path")
-          .attr("class", "line")
-          .attr("marker-end", "url(#marker_arrow)")
-          .on("mousedown", line_mousedown);
-        link.exit().remove();
-
-        linkText = allTexts.selectAll(".linetextbody").data(refLink.value);
-        var linkTextg = linkText
-          .enter()
-          .append("svg:foreignObject")
-          .attr("class", "linetextbody")
-          .attr("value", (d) => `${d.id}`)
-          .attr("width", 82 + "px")
-          .attr("height", 21 + "px");
-        linkTextg
-          .html(
-            (d) =>
-              `<textarea class="textarea-line" id="linetext${d.id}">${d.text}</textarea>`
-          )
-          .attr("x", 3)
-          .attr("dominant-baseline", "auto")
-          .on("change", updateTextLink);
-        linkText.exit().remove();
-
+        //update function join the data with the graph elements
         node = allNodes
           .selectAll(".node")
           .data(refShape.value, (d) => d.id)
           .classed("selected", (d) => d === selected_node)
-          .classed("selected_target", (d) => d === selected_target_node);
+          .classed("selected_target", (d) => d === selected_target_node)
+          .on("mousedown", node_mousedown)
+          .on("mouseover", node_mouseover)
+          .on("mouseout", node_mouseout);
         var nodeg = node
           .enter()
           .append("g")
@@ -220,10 +195,8 @@ export default {
           .attr("width", width + "px")
           .attr("height", height + "px")
           .attr("rx", "5")
-          .attr("ry", "5")
-          .on("mousedown", node_mousedown)
-          .on("mouseover", node_mouseover)
-          .on("mouseout", node_mouseout);
+          .attr("ry", "5");
+
         nodeg
           .append("foreignObject")
           .attr("x", 7)
@@ -239,32 +212,47 @@ export default {
           .on("change", updateTextNode);
         node.exit().remove();
 
-        simulation.nodes(refShape.value).on("tick", ticked);
-        simulation.force(
-          "link",
-          d3
-            .forceLink(refLink.value)
-            .id((d) => d.id)
-            .distance(160)
-        );
+        linkText = allTexts
+          .selectAll(".linkWText")
+          .data(refLink.value, (d) => d.id)
+          .classed("selected", (d) => d === selected_link);
+        var linkTextg = linkText.enter().append("g").attr("class", "linkWText");
+        linkTextg
+          .append("svg:path")
+          .attr("class", "line")
+          .attr("marker-end", "url(#marker_arrow)")
+          .on("mousedown", line_mousedown);
+        linkTextg
+          .append("svg:foreignObject")
+          .attr("class", "linetextbody")
+          .attr("value", (d) => `${d.id}`)
+          .attr("width", 82 + "px")
+          .attr("height", 21 + "px")
+          .html(
+            (d) =>
+              `<textarea class="textarea-line" id="linetext${d.id}">${d.text}</textarea>`
+          )
+          .attr("dominant-baseline", "auto")
+          .on("change", updateTextLink);
+        linkText.exit().remove();
         simulation.restart();
       }
 
       function ticked() {
+        //ticked give the position to the elements on the simluation graph
+        node.attr("transform", (d) => "translate(" + d.x + "," + d.y + ")");
         //curve the link
-        link.attr("d", positionLink);
-
-        //adding text to links
-        linkText
+        allTexts.selectAll(".line").attr("d", positionLink);
+        allTexts
+          .selectAll(".linetextbody")
           .attr(
             "x",
             (d) => (d.source.x + width / 2 + (d.target.x + width / 2)) / 2 - 15
           )
           .attr("y", (d) => (d.source.y + height + d.target.y) / 2 - 20);
-        //position of nodes linked
-        node.attr("transform", (d) => "translate(" + d.x + "," + d.y + ")");
       }
       function positionLink(d) {
+        //this function is the curve of the links
         var offset = 30;
 
         var midpoint_x = (d.source.x + d.target.x) / 2;
@@ -293,6 +281,22 @@ export default {
           d.target.y
         );
       }
+      function getIdNode() {
+        //asign an Id for a node
+        if (refShape.value.length == 0) {
+          return 0;
+        }
+        let listOfIds = refShape.value.map((x) => x.id);
+        return Math.max.apply(null, listOfIds) + 1;
+      }
+      function getIdLink() {
+        //asign an Id for a link
+        if (refLink.value.length == 0) {
+          return 0;
+        }
+        let listOfIds = refLink.value.map((x) => x.id);
+        return Math.max.apply(null, listOfIds) + 1;
+      }
 
       function addNode(x) {
         refShape.value.push(x);
@@ -300,44 +304,53 @@ export default {
       function addLink(x) {
         refLink.value.push(x);
       }
+
+      function updateTextNode() {
+        let textAreaId = d3.select(this).select(".textarea-node").attr("id"); //element id : nodetext${d.id}
+        let textArea = document.getElementById(textAreaId); //element with the id
+        textArea.innerHTML = textArea.value; //updating text inside
+        d3.select(this).select(".textarea-node").html(textArea.innerHTML); //updating text in html doc
+        textArea.onblur = function () {
+          //updating text on blur event
+          textArea.innerHTML = textArea.value; //updating text inside
+          d3.select(this).select(".textarea-node").html(textArea.innerHTML); //updating text in html doc
+        };
+        editTextNode(textAreaId, textArea);
+      }
+      ///////////////////////////
       function editTextNode(textAreaId, textArea) {
-        let i = parseInt(
+        let valueid = parseInt(
           document
             .getElementById(textAreaId)
-            .parentNode.parentNode.getAttribute("value")
+            .parentNode.parentNode.getAttribute("value") //value: ${d.id}
         );
-        let element = refShape.value.filter((e) => e.id == i)[0]; //data from element that was edited
+        let element = refShape.value.filter((e) => e.id == valueid)[0]; //data from element that was edited
         element.text = textArea.innerHTML;
       }
+
+      ////////////////////////////
+      function updateTextLink() {
+        let textAreaId = d3.select(this).select(".textarea-line").attr("id"); //element id : linetext${d.id}
+        let textArea = document.getElementById(textAreaId); //element with the id
+        textArea.innerHTML = textArea.value; //updating text inside
+        d3.select(this).select(".textarea-line").html(textArea.innerHTML); //updating text in html doc
+        textArea.onblur = function () {
+          //updating text on blur event
+          textArea.innerHTML = textArea.value; //updating text inside
+          d3.select(this).select(".textarea-line").html(textArea.innerHTML); //updating text in html doc
+        };
+        editTextLink(textAreaId, textArea);
+      }
+      ///////////////////////////////
       function editTextLink(textAreaId, textArea) {
         let i = parseInt(
-          document.getElementById(textAreaId).parentNode.getAttribute("value")
+          document.getElementById(textAreaId).parentNode.getAttribute("value") //value: ${d.id}
         );
         let element = refLink.value.filter((e) => e.id == i)[0]; //data from element that was edited
         element.text = textArea.innerHTML;
       }
-      function updateTextNode() {
-        let textAreaId = d3.select(this).select(".textarea-node").attr("id"); //element Id
-        let textArea = document.getElementById(textAreaId); //element
-        textArea.innerHTML = textArea.value;
-        d3.select(this).select(".textarea-node").html(textArea.innerHTML); //end on change
-        textArea.onblur = function () {
-          textArea.innerHTML = textArea.value;
-          d3.select(this).select(".textarea-node").html(textArea.innerHTML); //end on blur
-        };
-        editTextNode(textAreaId, textArea);
-      }
-      function updateTextLink() {
-        let textAreaId = d3.select(this).select(".textarea-line").attr("id"); //element Id
-        let textArea = document.getElementById(textAreaId); //element
-        textArea.innerHTML = textArea.value;
-        d3.select(this).select(".textarea-node").html(textArea.innerHTML); //end on change
-        textArea.onblur = function () {
-          textArea.innerHTML = textArea.value;
-          d3.select(this).select(".textarea-node").html(textArea.innerHTML); //end on blur
-        };
-        editTextLink(textAreaId, textArea);
-      }
+      //////////////////////////////
+
       // select target node for new node connection
       function node_mouseover(d) {
         if (drawing_line && d !== selected_node) {
@@ -386,7 +399,7 @@ export default {
           if (Math.sqrt(dx * dx + dy * dy) > 10) {
             // draw a line
             if (!new_line) {
-              new_line = allLinks.append("line").attr("class", "new_line");
+              new_line = allTexts.append("line").attr("class", "new_line");
             }
             new_line
               .attr("x1", selected_node.x)
@@ -398,15 +411,16 @@ export default {
         update();
       }
 
-      // add a new disconnected node
+      // add a new disconnected node in a specific position
       function addingNode() {
-        // d3.event.preventDefault();
-        //var m = d3.mouse(svg.node());
         addNode({
-          id: refShape.value.length,
+          id: getIdNode(),
           x: 10,
           y: 10,
-          text: "Text" + " " + refShape.value.length,
+          fx: 10,
+          fy: 10,
+          text: "Text" + " " + getIdNode(),
+          fixed: true,
         });
         selected_link = null;
         simulation.stop();
@@ -414,13 +428,17 @@ export default {
         simulation.tick();
       }
       function mousedown() {
+        // add a new disconnected node in the mouse position
         d3.event.preventDefault();
         var m = d3.mouse(g.node());
         addNode({
-          id: refShape.value.length,
+          id: getIdNode(),
           x: m[0],
           y: m[1],
-          text: "Text" + " " + refShape.value.length,
+          fx: m[0],
+          fy: m[1],
+          text: "Text" + " " + getIdNode(),
+          fixed: true,
         });
         selected_link = null;
         simulation.stop();
@@ -438,16 +456,19 @@ export default {
           } else {
             var m = d3.mouse(g.node());
             new_node = {
-              id: refShape.value.length,
+              id: getIdNode(),
               x: m[0],
               y: m[1],
-              text: "Text" + " " + refShape.value.length,
+              fx: m[0],
+              fy: m[1],
+              text: "Text" + " " + getIdNode(),
+              fixed: true,
             };
             addNode(new_node);
           }
           selected_node.fixed = false;
           addLink({
-            id: refLink.value.length,
+            id: getIdLink(),
             source: selected_node,
             target: new_node,
             text: selected_node.id + " to " + new_node.id,
@@ -464,33 +485,31 @@ export default {
       function deleteNodeorLink() {
         if (selected_node) {
           // deal with nodes
-          var i = refShape.value.indexOf(selected_node);
-          refShape.value.splice(i, 1);
+          if (refShape.value.indexOf(selected_node) > -1) {
+            let i = refShape.value.indexOf(selected_node);
+            refShape.value.splice(i, 1);
+          }
           // find links to/from this node, and delete them too
-          var new_links = [];
-          refLink.value.forEach(function (l) {
+
+          let new_links = [];
+          refLink.value.forEach((l) => {
             if (l.source !== selected_node && l.target !== selected_node) {
-              new_links.push(l);
+              new_links.push(l); //the list of links not related with the selected node
             }
           });
-          refLink.value = new_links;
-          selected_node = refShape.value.length
-            ? refShape.value[i > 0 ? null : null]
-            : null;
-          simulation.stop();
-          update();
-          simulation.tick();
+          refLink.value.splice(0, refLink.value.length);
+          refLink.value.splice(0, 1); // clean the list of links
+          for (let i = 0; i < new_links.length; i++) {
+            refLink.value.push(new_links[i]);
+          }
+          selected_node = null;
         } else if (selected_link) {
           // deal with links
-          i = refLink.value.indexOf(selected_link);
+          let i = refLink.value.indexOf(selected_link);
           refLink.value.splice(i, 1);
-          selected_link = refLink.value.length
-            ? refLink.value[i > 0 ? null : null]
-            : null;
-          simulation.stop();
-          update();
-          simulation.tick();
+          selected_link = null;
         }
+        update();
       }
 
       // select for dragging node with shift; delete node with backspace
@@ -499,30 +518,8 @@ export default {
           case 8: // backspace
           case 46: {
             // delete
-            if (selected_node) {
-              // deal with nodes
-              var i = refShape.value.indexOf(selected_node);
-              refShape.value.splice(i, 1);
-              // find links to/from this node, and delete them too
-              var new_links = [];
-              refLink.value.forEach(function (l) {
-                if (l.source !== selected_node && l.target !== selected_node) {
-                  new_links.push(l);
-                }
-              });
-              refLink.value = new_links;
-              selected_node = refShape.value.length
-                ? refShape.value[i > 0 ? null : null]
-                : null;
-            } else if (selected_link) {
-              // deal with links
-              i = refLink.value.indexOf(selected_link);
-              refLink.value.splice(i, 1);
-              selected_link = refLink.value.length
-                ? refLink.value[i > 0 ? null : null]
-                : null;
-            }
-            update();
+            deleteNodeorLink()
+            simulation.restart();
             break;
           }
           case 17: {
@@ -551,7 +548,7 @@ export default {
       update();
     });
 
-    return { svgRef, mousedown, resizeRef };
+    return { svgRef, resizeRef };
   },
 };
 </script>
@@ -577,7 +574,7 @@ g.node .rect {
   stroke: #f3c371;
 }
 g.node .rect:hover {
-  stroke-width: 3px;
+  stroke-width: 5px;
 }
 .rect:active {
   cursor: grabbing;
@@ -610,9 +607,13 @@ g.node .rect:hover {
   stroke-width: 4px;
 }
 
-path.line.selected {
-  stroke: red;
+g.selected path.line {
+  stroke: rgb(237, 97, 97);
   stroke-opacity: 1;
+}
+.line:hover {
+  stroke: #f3c371;
+  stroke-width: 3px;
 }
 g.node.selected rect.rect {
   fill: #f3c371;
@@ -652,7 +653,7 @@ g.node.selected_target rect.rect {
   background-color: #fff;
   width: 250px;
   position: absolute;
-  padding: 0px 2rem;
+  padding: 0px 1rem;
   display: inline-block;
   justify-content: left;
   align-items: left;
@@ -664,9 +665,18 @@ g.node.selected_target rect.rect {
   font-size: 14px;
   font-family: Helvetica, sans-serif;
 }
+.box-inner ul {
+  padding-left: 10px;
+}
 .box-inner button {
   margin: 0.7rem;
   width: 100px;
   font-size: 12px;
+}
+@media only screen and (min-width: 960px) and (max-width: 1279px) {
+  .menu-inner{
+  display: block;
+  width: 460px;
+}
 }
 </style>
