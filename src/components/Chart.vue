@@ -1,10 +1,12 @@
 <template>
   <div class="mainChart">
     <div ref="resizeRef" class="resizeRef">
-      
       <div class="box-inner">
-        <button class="inner-btn addnode">Add <br>node</button>
-        <button class="inner-btn delelem">Delete<br> element</button>
+        <button class="inner-btn addnode">Add <br />node</button>
+        <button class="inner-btn delelem">
+          Delete<br />
+          element
+        </button>
       </div>
       <svg ref="svgRef" class="svgRef"></svg>
     </div>
@@ -38,6 +40,14 @@ export default {
       should_drag = false,
       drawing_line = false;
     onMounted(() => {
+      document.addEventListener("wheel", function () {
+        if (
+          document.activeElement.type === "number" &&
+          document.activeElement.classList.contains("noscroll")
+        ) {
+          document.activeElement.blur();
+        }
+      });
       // pass ref with DOM element to D3, when mounted (DOM available)
       const svg = d3.select(svgRef.value);
       svg.attr("height", heightGraph).attr("width", widthGraph);
@@ -140,7 +150,7 @@ export default {
         .on("keyup", keyup);
 
       //context menu to add node
-      contGraph.on("contextmenu", mousedown).on("click", () => {
+      contGraph.on("contextmenu", addNewNode).on("click", () => {
         d3.event.preventDefault();
         selected_node = null;
         selected_link = null;
@@ -178,15 +188,38 @@ export default {
           .append("foreignObject")
           .attr("x", 7)
           .attr("y", 7)
-          .attr("class", "nodebody")
+          .attr("class", "nodebodynumber")
           .attr("width", width - 16 + "px")
-          .attr("height", height - 13 + "px")
+          .attr("height", height - 34 + "px")
           .html(
             (d) =>
-              `<textarea class="textarea-node" id="nodetext${d.id}">${d.text}</textarea>`
+              `<input class="input-node noscroll" type="number" placeholder="value" id="nodenumber${d.id}"></input>`
           )
           .attr("dominant-baseline", "auto")
-          .on("change", updateTextNode);
+          .on("change", updateNumberNode)
+          .on("click", () => {
+            d3.event.preventDefault();
+            selected_node = null;
+            selected_link = null;
+          });
+        nodeg
+          .append("foreignObject")
+          .attr("x", 7)
+          .attr("y", 26)
+          .attr("class", "nodebodytext")
+          .attr("width", width - 16 + "px")
+          .attr("height", height - 34 + "px")
+          .html(
+            (d) =>
+              `<textarea class="textarea-node" placeholder="Text" id="nodetext${d.id}">${d.text}</textarea>`
+          )
+          .attr("dominant-baseline", "auto")
+          .on("change", updateTextNode)
+          .on("click", () => {
+            d3.event.preventDefault();
+            selected_node = null;
+            selected_link = null;
+          });
         node.exit().remove();
 
         linkText = allTexts
@@ -207,10 +240,15 @@ export default {
           .attr("height", 21 + "px")
           .html(
             (d) =>
-              `<textarea class="textarea-line" id="linetext${d.id}">${d.text}</textarea>`
+              `<textarea class="textarea-line" placeholder="Relation" id="linetext${d.id}">${d.text}</textarea>`
           )
           .attr("dominant-baseline", "auto")
-          .on("change", updateTextLink);
+          .on("change", updateTextLink)
+          .on("click", () => {
+            d3.event.preventDefault();
+            selected_node = null;
+            selected_link = null;
+          });
         linkText.exit().remove();
         simulation.restart();
       }
@@ -281,7 +319,24 @@ export default {
       function addLink(x) {
         refLink.value.push(x);
       }
-
+      //////////////////NUMBER
+      function updateNumberNode() {
+        let inputNumberId = d3.select(this).select(".input-node").attr("id");
+        let inputNumber = document.getElementById(inputNumberId);
+        editNumberNode(inputNumberId, inputNumber);
+      }
+      ///////////////////////////
+      function editNumberNode(inputNumberId, inputNumber) {
+        let valueid = parseInt(
+          document
+            .getElementById(inputNumberId)
+            .parentNode.parentNode.getAttribute("value") //value: ${d.id}
+        );
+        let element = refShape.value.filter((e) => e.id == valueid)[0]; //data from element that was edited
+        element.value = parseInt(inputNumber.value);
+        console.log(element.value);
+      }
+      //////////////////TEXT
       function updateTextNode() {
         let textAreaId = d3.select(this).select(".textarea-node").attr("id"); //element id : nodetext${d.id}
         let textArea = document.getElementById(textAreaId); //element with the id
@@ -302,6 +357,7 @@ export default {
             .parentNode.parentNode.getAttribute("value") //value: ${d.id}
         );
         let element = refShape.value.filter((e) => e.id == valueid)[0]; //data from element that was edited
+        console.log(element);
         element.text = textArea.innerHTML;
       }
 
@@ -373,7 +429,7 @@ export default {
           // debounce - only start drawing line if it gets a bit big
           var dx = selected_node.x - x;
           var dy = selected_node.y - y;
-          if (Math.sqrt(dx * dx + dy * dy) > 10) {
+          if (Math.sqrt(dx * dx + dy * dy) > 80) {
             // draw a line
             if (!new_line) {
               new_line = allTexts.append("line").attr("class", "new_line");
@@ -396,15 +452,16 @@ export default {
           y: 10,
           fx: 10,
           fy: 10,
-          text: "Text" + " " + getIdNode(),
           fixed: true,
+          text: "",
+          value: null,
         });
         selected_link = null;
         simulation.stop();
         update();
         simulation.tick();
       }
-      function mousedown() {
+      function addNewNode() {
         // add a new disconnected node in the mouse position
         d3.event.preventDefault();
         var m = d3.mouse(g.node());
@@ -414,8 +471,10 @@ export default {
           y: m[1],
           fx: m[0],
           fy: m[1],
-          text: "Text" + " " + getIdNode(),
           fixed: true,
+          text: "",
+
+          value: null,
         });
         selected_link = null;
         simulation.stop();
@@ -438,8 +497,9 @@ export default {
               y: m[1],
               fx: m[0],
               fy: m[1],
-              text: "Text" + " " + getIdNode(),
               fixed: true,
+              text: "",
+              value: null,
             };
             addNode(new_node);
           }
@@ -448,7 +508,7 @@ export default {
             id: getIdLink(),
             source: selected_node,
             target: new_node,
-            text: selected_node.id + " to " + new_node.id,
+            text: "",
           });
           selected_node = selected_target_node = null;
           update();
@@ -531,7 +591,7 @@ export default {
 </script>
 
 <style>
-.mainChart{
+.mainChart {
   margin-top: 39.7px;
   padding: 0 6px;
 }
@@ -559,12 +619,13 @@ g.node .rect:hover {
 }
 
 .linetextbody:hover,
-.nodebody {
+.nodebodytext {
   cursor: text;
 }
 
 .linetextbody,
-.nodebody {
+.nodebodytext,
+.nodebodynumber {
   background-color: #fbd594;
 }
 .line {
@@ -601,11 +662,14 @@ g.node.selected_target rect.rect {
   fill: #f6f3a2;
   stroke-width: 1.5px;
 }
+.input-node {
+  width: 76px;
+}
 .textarea-node {
   background-color: #fbd594;
   font-size: 9px;
   width: 80px;
-  height: 64px;
+  height: 28px;
   resize: none;
   overflow: hidden;
   padding: 0;
@@ -645,5 +709,10 @@ g.node.selected_target rect.rect {
   margin: 0.7rem;
   width: 80px;
   font-size: 11px;
+}
+input[type=number]::-webkit-inner-spin-button,
+input[type=number]::-webkit-outer-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
 }
 </style>
