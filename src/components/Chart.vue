@@ -1,35 +1,12 @@
 <template>
-  <div style="padding: 2rem; margin-top: 56px">
+  <div class="mainChart">
     <div ref="resizeRef" class="resizeRef">
-      <svg ref="svgRef" class="svgRef"></svg>
-      <div class="menu-inner box-inner">
-        <ul>
-          <li>Add a node: right click. (Context menu)</li>
-          <li>
-            Link nodes: drag from a node to another to connect nodes.
-          </li>
-          <li>Additionaly if not target is selected, It creates a new node</li>
-        </ul>
-        <ul>
-          Drag and drop
-          <li>Windows: Ctrl + left click.</li>
-          <li>Mac: ⌘+ left click.</li>
-        </ul>
-        <ul>
-          Zoom
-          <li>Scrool with mouse</li>
-        </ul>
-        <ul>
-          <li>Remove nodes: Press Supr / Backspace to delete nodes or lines</li>
-        </ul>
-        <ul>
-          Also, use the buttons
-        </ul>
-        <div>
-          <button class="inner-btn addnode">Add node</button>
-          <button class="inner-btn delelem">Delete element</button>
-        </div>
+      
+      <div class="box-inner">
+        <button class="inner-btn addnode">Add <br>node</button>
+        <button class="inner-btn delelem">Delete<br> element</button>
       </div>
+      <svg ref="svgRef" class="svgRef"></svg>
     </div>
   </div>
 </template>
@@ -48,11 +25,11 @@ export default {
     var refShape = ref(props.datashapes);
     var refLink = ref(props.datalinks);
     //width and heigt for rect of nodes
-    const width = 96;
-    const height = 78;
+    const width = 100;
+    const height = 62.5;
     //size for graph
-    var widthGraph = 960;
-    var heightGraph = 500;
+    var widthGraph = 1220;
+    var heightGraph = 728;
     //elements for new link function
     var selected_node,
       selected_target_node,
@@ -150,7 +127,7 @@ export default {
         d3
           .forceLink(refLink.value)
           .id((d) => d.id)
-          .distance(160)
+          .distance(130)
       );
       simulation.tick();
       // add some collision detection so they don't overlap
@@ -518,7 +495,7 @@ export default {
           case 8: // backspace
           case 46: {
             // delete
-            deleteNodeorLink()
+            deleteNodeorLink();
             simulation.restart();
             break;
           }
@@ -554,8 +531,12 @@ export default {
 </script>
 
 <style>
+.mainChart{
+  margin-top: 39.7px;
+  padding: 0 6px;
+}
 .svgRef {
-  box-shadow: 5px 10px #888888;
+  box-shadow: -2px 5px 10px #888888;
 }
 .container-graph {
   fill: #fcf0f064;
@@ -565,9 +546,6 @@ export default {
 }
 .node:hover {
   cursor: grab;
-}
-.graph {
-  cursor: move;
 }
 g.node .rect {
   fill: #fed17e;
@@ -651,32 +629,21 @@ g.node.selected_target rect.rect {
 }
 .box-inner {
   background-color: #fff;
-  width: 250px;
-  position: absolute;
-  padding: 0px 1rem;
+  width: fit-content;
+  width: -webkit-fit-content;
+  width: -moz-fit-content;
+  top: 39px;
+  right: 0.5rem;
+  z-index: 1;
+  position: fixed;
   display: inline-block;
-  justify-content: left;
-  align-items: left;
   box-shadow: 0 1px 1px rgba(0, 0, 0, 0.16), 0 1px 1px rgba(0, 0, 0, 0.23);
-  margin-left: 0.7rem;
 }
-.box-inner {
-  margin: 0;
-  font-size: 14px;
-  font-family: Helvetica, sans-serif;
-}
-.box-inner ul {
-  padding-left: 10px;
-}
+
 .box-inner button {
-  margin: 0.7rem;
-  width: 100px;
-  font-size: 12px;
-}
-@media only screen and (min-width: 960px) and (max-width: 1279px) {
-  .menu-inner{
   display: block;
-  width: 460px;
-}
+  margin: 0.7rem;
+  width: 80px;
+  font-size: 11px;
 }
 </style>

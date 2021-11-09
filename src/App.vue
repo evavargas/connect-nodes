@@ -1,16 +1,23 @@
 <template>
   <div>
     <header>
-      <div @click="show = !show">
-        <MenuOutline class="ion-icon" />
+      <div class="menu-header">
+        <div @click="showOptions = !showOptions">
+          <MenuOutline class="ion-icon" v-if="!showOptions" />
+          <MdCloseCircleOutlineIcon class="ion-icon" v-if="showOptions" />
+        </div>
+        <div @click="showHelp = !showHelp">
+          <MdHelpCircleIcon class="ion-icon" v-if="!showHelp" />
+          <MdCloseCircleOutlineIcon class="ion-icon" v-if="showHelp" />
+        </div>
       </div>
     </header>
-    <aside class="box-app" v-if="show" transition="slide">
+    <aside class="box-opt" v-if="showOptions">
       <ul>
         <li>
           <div class="button">
             <label for="newChart" class="input"
-              ><DocumentOutline class="ion-icon" />New chart</label
+              ><MdDocumentIcon class="ion-icon" />New chart</label
             >
             <input
               type="button"
@@ -24,7 +31,7 @@
         <li>
           <div class="button">
             <label for="files" class="input"
-              ><FolderOpenOutline class="ion-icon" />Open chart</label
+              ><MdFolderOpenIcon class="ion-icon" />Open chart</label
             >
             <input
               type="file"
@@ -37,7 +44,7 @@
         </li>
         <li>
           <div class="button">
-            <DownloadOutline class="ion-icon" />
+            <MdDownloadIcon class="ion-icon" />
             <a
               class="input"
               id="downloadFile"
@@ -50,24 +57,57 @@
         </li>
       </ul>
     </aside>
+    <aside class="box-help" v-if="showHelp" transition="slide">
+      <ul>
+        Add a node
+        <li>Right click. (Context menu) or button <strong>Add Node</strong></li>
+      </ul>
+      <ul>
+        Link nodes
+        <li>
+          Drag from a node to another to connect nodes. Additionaly if not
+          target is selected, It creates a new node
+        </li>
+      </ul>
+      <ul>
+        Drag and drop
+        <li>Windows: Ctrl + left click.</li>
+        <li>Mac: ⌘ + left click.</li>
+      </ul>
+      <ul>
+        Zoom
+        <li>Scrool with mouse</li>
+      </ul>
+      <ul>
+        Remove nodes or links
+        <li>
+          Select the element and Press Supr or Backspace to delete nodes or
+          lines
+        </li>
+        <li>Also, use the button <strong>Delete element</strong></li>
+      </ul>
+    </aside>
     <div class="body-chart">
       <keep-alive>
-      <Chart
-        :datashapes="datanodes"
-        :datalinks="datalinks"
-        :key="componentKey"
-      />
-    </keep-alive>
+        <Chart
+          :datashapes="datanodes"
+          :datalinks="datalinks"
+          :key="componentKey"
+        />
+      </keep-alive>
     </div>
   </div>
 </template>
 
 <script>
 //import { defineAsyncComponent } from "vue";
-import MenuOutline from "vue-ionicons/dist/ios-menu.vue";
-import FolderOpenOutline from "vue-ionicons/dist/ios-folder-open.vue";
-import DocumentOutline from "vue-ionicons/dist/ios-document.vue";
-import DownloadOutline from "vue-ionicons/dist/ios-download.vue";
+import MenuOutline from "vue-ionicons/dist/ios-menu.vue"; //Menu
+import MdHelpCircleIcon from "vue-ionicons/dist/md-help-circle.vue"; //Help
+import MdCloseCircleOutlineIcon from "vue-ionicons/dist/md-close-circle-outline.vue"; //Close
+import MdDocumentIcon from "vue-ionicons/dist/md-document.vue"; //New
+import MdFolderOpenIcon from "vue-ionicons/dist/md-folder-open.vue"; //Open
+import MdDownloadIcon from "vue-ionicons/dist/md-download.vue"; //Download
+//Component
 import Chart from "./components/Chart.vue";
 
 export default {
@@ -75,13 +115,16 @@ export default {
   components: {
     Chart, //: defineAsyncComponent(() => import("./components/Chart.vue")),
     MenuOutline,
-    FolderOpenOutline,
-    DocumentOutline,
-    DownloadOutline,
+    MdDocumentIcon,
+    MdFolderOpenIcon,
+    MdDownloadIcon,
+    MdHelpCircleIcon,
+    MdCloseCircleOutlineIcon,
   },
   data: function () {
     return {
-      show: false,
+      showHelp: false,
+      showOptions: false,
       datanodes: [],
       datalinks: [],
       json: "",
@@ -91,14 +134,13 @@ export default {
     };
   },
   methods: {
-    
     openFile(ev) {
       const file = ev.target.files[0];
       const reader = new FileReader();
       if (file) {
-        reader.addEventListener('error', () => {
-          alert(`Error occurred reading file: ${file.name}`)
-        })
+        reader.addEventListener("error", () => {
+          alert(`Error occurred reading file: ${file.name}`);
+        });
       }
       reader.onload = (e) => {
         {
@@ -150,14 +192,21 @@ export default {
 </script>
 
 <style >
+body{
+  margin: 0;
+}
+.menu-header {
+  display: flex;
+  justify-content: space-between;
+}
 header {
   width: 100%;
-  height: 56px;
+  height: 36px;
   position: fixed;
   top: 0;
   left: 0;
-  z-index: 80;
-  background-color: #fff;
+  z-index: 1;
+  background-color: #cdefff;
   box-shadow: 2px 2px 5px 0 rgba(0, 0, 0, 0.095);
   padding: 8px 16px;
   overflow: hidden;
@@ -171,27 +220,31 @@ header {
   stroke-width: 8px;
   stroke-opacity: 0.9;
 }
-.box-app {
-  background-color: #fff;
-  width: 250px;
+.ion-icon:active{
+  fill: rgba(37, 66, 232, 0.349);
+}
+
+.box-opt {
+  background-color: #cdefff;
+  width: 180px;
   position: fixed;
-  top: 55px;
+  top: 37px;
   left: 0;
   bottom: 0;
-  z-index: 1;
+  z-index: 2;
   display: flex;
   justify-content: left;
-  align-items: left;
   box-shadow: 0 3px 6px rgba(0, 0, 0, 0.16), 0 3px 6px rgba(0, 0, 0, 0.23);
 }
-.box-app ul {
+.box-opt ul {
   list-style: none;
+  padding: 0;
 }
-aside h2 {
-  font-weight: 300;
-  color: #afafaf;
+.box-opt ul li{
+  padding: 0.2rem 0.6rem;
 }
-.box-app .button {
+
+.box-opt .button {
   background-color: transparent;
   border: 0;
   width: 140px;
@@ -212,7 +265,7 @@ aside h2 {
   color: black;
 }
 .input:hover {
-  text-shadow: 1px 1px rgb(219, 250, 255);
+  text-shadow: 1px 1px rgba(37, 66, 232, 0.349);
 }
 .button .ion-icon {
   font-size: 14px;
@@ -228,17 +281,27 @@ aside h2 {
 .slide-leave {
   left: -100%;
 }
-@media only screen and (min-width: 1500px){
-  .body-chart{
-  display: flex;
-  justify-content: center;
+.box-help {
+  background-color: #cdefff;
+  width: 180px;
+  position: fixed;
+  top: 37px;
+  right: 0;
+  bottom: 0;
+  z-index: 2;
+  box-shadow: 0 3px 6px rgba(0, 0, 0, 0.16), 0 3px 6px rgba(0, 0, 0, 0.23);
 }
+ @media only screen and (min-width: 1500px) {
+  .body-chart {
+    display: flex;
+    justify-content: center;
+  }
 }
+/*
 @media only screen and (min-width: 1280px) and (max-width: 1350px) {
-  .body-chart{
-  display: flex;
-  justify-content: left;
-}
-}
-
+  .body-chart {
+    display: flex;
+    justify-content: left;
+  }
+} */
 </style>
