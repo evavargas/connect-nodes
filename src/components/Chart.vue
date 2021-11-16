@@ -124,7 +124,7 @@ export default {
             [0, 0],
             [widthGraph, heightGraph],
           ])
-          .scaleExtent([1, 10])
+          .scaleExtent([0.3, 10])
       );
       function zoomed() {
         g.attr("transform", d3.event.transform);
@@ -187,13 +187,13 @@ export default {
         nodeg
           .append("foreignObject")
           .attr("x", 7)
-          .attr("y", 7)
+          .attr("y", 5)
           .attr("class", "nodebodynumber")
-          .attr("width", width - 16 + "px")
-          .attr("height", height - 34 + "px")
+          .attr("width", width - 14 + "px")
+          .attr("height", height - 48 + "px")
           .html(
             (d) =>
-              `<input class="input-node noscroll" type="number" placeholder="value" id="nodenumber${d.id}"></input>`
+              `<input class="input-node noscroll" type="number" placeholder="Value" id="nodenumber${d.id}"></input>`
           )
           .attr("dominant-baseline", "auto")
           .on("change", updateNumberNode)
@@ -205,10 +205,10 @@ export default {
         nodeg
           .append("foreignObject")
           .attr("x", 7)
-          .attr("y", 26)
+          .attr("y", 24)
           .attr("class", "nodebodytext")
-          .attr("width", width - 16 + "px")
-          .attr("height", height - 34 + "px")
+          .attr("width", width - 14 + "px")
+          .attr("height", height - 28 + "px")
           .html(
             (d) =>
               `<textarea class="textarea-node" placeholder="Text" id="nodetext${d.id}">${d.text}</textarea>`
@@ -234,10 +234,12 @@ export default {
           .on("mousedown", line_mousedown);
         linkTextg
           .append("svg:foreignObject")
+          .attr("x", 0)
+          .attr("y", 0)
           .attr("class", "linetextbody")
           .attr("value", (d) => `${d.id}`)
-          .attr("width", 82 + "px")
-          .attr("height", 21 + "px")
+          .attr("width", width - 14 + "px")
+          .attr("height", height - 48 + "px")
           .html(
             (d) =>
               `<textarea class="textarea-line" placeholder="Relation" id="linetext${d.id}">${d.text}</textarea>`
@@ -663,29 +665,43 @@ g.node.selected_target rect.rect {
   stroke-width: 1.5px;
 }
 .input-node {
-  width: 76px;
-}
-.textarea-node {
+  width: 84px;
+  height: 12.5px;
   background-color: #fbd594;
   font-size: 9px;
-  width: 80px;
-  height: 28px;
+  padding: 0px;
+  margin: 0;
+  border: none;
+  outline: none;
+}
+
+.textarea-node {
+  background-color: #fbd594;
+  font-size: 8px;
+  width: 84px;
+  height: 33px;
+  border: none;
+  outline: none;
   resize: none;
   overflow: hidden;
   padding: 0;
-  border: none;
   text-anchor: start;
+  
 }
 .textarea-line {
   background-color: #fbd594;
-  font-size: 9px;
-  width: 80px;
+  font-size: 8px;
+  width: 84px;
+  height: 13px;
+  border: none;
+  outline: none;
   resize: none;
   overflow: hidden;
   padding: 0;
-  border: none;
   text-anchor: start;
-  margin-top: 1px;
+}
+.input-node:focus, .textarea-node:focus, .textarea-line:focus{
+    border: 1px solid salmon;
 }
 .linetextbody {
   background-color: #fed17e;
